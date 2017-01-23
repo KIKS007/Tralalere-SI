@@ -20,7 +20,7 @@ public class Scale : Behavior
 	public float _speed;
 
 	[Header ("Wait"), SerializeField]
-	public bool _wait = false;
+	public bool _wait = true;
 	public override bool Wait
 	{
 		get { return _wait; }
@@ -33,6 +33,7 @@ public class Scale : Behavior
 			Debug.LogWarning ("No Transform !");
 		
 		Tween tween = _transform.DOScale (_scale, _speed).SetSpeedBased ().SetRelative ();
+		tween.SetId ("Behavior" + _transform.gameObject.GetInstanceID ());
 
 		yield return tween.WaitForCompletion ();
 	}

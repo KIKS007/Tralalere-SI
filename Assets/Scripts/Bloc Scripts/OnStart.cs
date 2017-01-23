@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class OnStart : BehaviorsPlayer 
 {
-	protected override void Start ()
+	protected override void OnEnable ()
 	{
-		base.Start ();
+		base.OnEnable ();
 
 		if (debugMode)
 			Debug.Log ("OnStart : " + name);
-
+		
 		StartCoroutine (PlayBehaviors (BehaviorLoops));
 	}
 }

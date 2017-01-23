@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using System;
 
-public class Move : Behavior 
+public class Rotate : Behavior 
 {
 	[HideInInspector]
-	public string _name = "Move";
+	public string _name = "Rotate";
 	public override string Name
 	{
 		get { return _name; }
@@ -16,7 +15,7 @@ public class Move : Behavior
 
 	[Header ("Settings")]
 	public Rigidbody _rigidbody;
-	public Vector3 _position;
+	public Vector3 _rotation;
 	public float _speed;
 
 	[Header ("Wait"), SerializeField]
@@ -31,8 +30,8 @@ public class Move : Behavior
 	{
 		if (_rigidbody == null)
 			Debug.LogWarning ("No Rigidbody !");
-		
-		Tween tween = _rigidbody.DOMove (_position, _speed).SetSpeedBased ().SetRelative ();
+
+		Tween tween = _rigidbody.DORotate (_rotation, _speed).SetSpeedBased ().SetRelative ();
 		tween.SetId ("Behavior" + _rigidbody.gameObject.GetInstanceID ());
 
 		yield return tween.WaitForCompletion ();

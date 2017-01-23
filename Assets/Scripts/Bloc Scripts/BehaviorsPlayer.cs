@@ -12,10 +12,29 @@ public class BehaviorsPlayer : MonoBehaviour
 	[Header ("Debug")]
 	public bool debugMode = false;
 
+	private Vector3 initialPosition;
 
-	protected virtual void Start ()
+	protected virtual void Awake ()
 	{
+		initialPosition = transform.position;
+	}
+
+	protected virtual void OnEnable ()
+	{
+		ResetBehaviors ();
 		SetupBehaviors (BehaviorLoops);
+	}
+
+	public virtual void ResetBehaviors ()
+	{
+		KillBehaviors ();
+		transform.position = initialPosition;
+
+		if (GetComponent<Collider> () != null)
+			GetComponent<Collider> ().material = null;
+		
+		else if (transform.GetChild (0).GetComponent<Collider> () != null)
+			transform.GetChild (0).GetComponent<Collider> ().material = null;
 	}
 
 	protected void SetupBehaviors (List<BehaviorsLoops> behaviorsLoops)
@@ -24,7 +43,14 @@ public class BehaviorsPlayer : MonoBehaviour
 		{
 			for(int i = 0; i < behaviorLoop.Behaviors.Count; i++)
 			{
-				behaviorLoop.Behaviors[i].GetType().GetField("_transform", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(behaviorLoop.Behaviors[i], transform);
+				if(behaviorLoop.Behaviors[i].GetType().GetField("_gameObject", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) != null)
+					behaviorLoop.Behaviors[i].GetType().GetField("_gameObject", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(behaviorLoop.Behaviors[i], gameObject);
+				
+				if(behaviorLoop.Behaviors[i].GetType().GetField("_transform", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) != null)
+					behaviorLoop.Behaviors[i].GetType().GetField("_transform", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(behaviorLoop.Behaviors[i], transform);
+
+				if(behaviorLoop.Behaviors[i].GetType().GetField("_rigidbody", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) != null)
+					behaviorLoop.Behaviors[i].GetType().GetField("_rigidbody", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(behaviorLoop.Behaviors[i], GetComponent<Rigidbody> ());
 			}			
 		}
 	}
@@ -119,5 +145,10 @@ public class BehaviorsPlayer : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	public void KillBehaviors ()
+	{
+		DOTween.Kill ("Behavior" + gameObject.GetInstanceID ());
 	}
 }
