@@ -4,12 +4,12 @@ using UnityEditor;
 
 public class CreateScriptableObject
 {
-	[MenuItem ("Assets/Create/CodeBlock")]
+	[MenuItem ("Assets/Create/Behavior")]
 	public static void CreateMyAsset ()
 	{
-		Move asset = ScriptableObject.CreateInstance<Move> ();
+		Scale asset = ScriptableObject.CreateInstance<Scale> ();
 
-		AssetDatabase.CreateAsset (asset, "Assets/Scripts/Behaviors Objects" + asset.Name + ".asset");
+		AssetDatabase.CreateAsset (asset, "Assets/Scripts/Behaviors Objects/" + asset.Name + ".asset");
 		AssetDatabase.SaveAssets ();
 
 		EditorUtility.FocusProjectWindow ();
