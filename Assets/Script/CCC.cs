@@ -19,6 +19,8 @@ public class CCC : MonoBehaviour
     public float TopAngleLimit = 90f;
     public LayerMask Ground;
 
+
+
 	Player player;
     Transform _cam, _groundCheck;
     Rigidbody _body;
@@ -30,6 +32,7 @@ public class CCC : MonoBehaviour
     bool _isGrounded = false;
     bool _canJump = true;
 	int _jumpCounter = 0;
+	Vector3 _lastCheckpoint;
 
     //setup the references
     void Awake()
@@ -97,7 +100,11 @@ public class CCC : MonoBehaviour
             }
 
         }
-			
+
+		//TESTING STUFF-----------------------------------------
+		if (Input.GetKey(KeyCode.T)) {
+			GoToCheckpoint();
+		}
     }
 
     void FixedUpdate()
@@ -172,5 +179,16 @@ public class CCC : MonoBehaviour
 		if (collision.collider.tag == "Platform") {
 			transform.parent = null;
 		}
+	}
+
+	void OnTriggerEnter (Collider collider) {
+		if (collider.tag == "Checkpoint") {
+			_lastCheckpoint = collider.transform.position;
+		}
+	}
+
+	public void GoToCheckpoint () {
+		gameObject.transform.position = _lastCheckpoint;
+		_body.velocity = Vector3.zero;
 	}
 }
