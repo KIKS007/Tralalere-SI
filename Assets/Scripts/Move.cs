@@ -5,6 +5,8 @@ using DG.Tweening;
 
 public class Move : Behavior 
 {
+	public string Name = "Move";
+
 	public Transform _transform;
 	public Vector3 _position;
 	public float _speed;
