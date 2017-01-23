@@ -76,7 +76,7 @@ public class CCC : MonoBehaviour
         _cam.localEulerAngles = rot;
 
         //MOVEMENT-----------------------------------------------
-		_speed = transform.forward * player.GetAxis ("Move Vertical") + transform.right * player.GetAxis("Move Horizontal");
+		_speed = transform.forward * player.GetAxisRaw ("Move Vertical") + transform.right * player.GetAxisRaw ("Move Horizontal");
 		_speed.Normalize ();
 		_speed *= RunSpeed;
 
@@ -157,5 +157,20 @@ public class CCC : MonoBehaviour
 		_jumpCounter--;
     }
 
+	void OnCollisionEnter (Collision collision) {
+		if (collision.collider.tag == "Platform") {
+			RaycastHit hit;
+			if (Physics.Raycast(_groundCheck.position, Vector3.down, out hit)) {
+				if (hit.collider.tag == "Platform") {
+					transform.parent = collision.collider.transform.GetChild (0).transform;
+				}
+			}
+		}
+	}
 
+	void OnCollisionExit (Collision collision) {
+		if (collision.collider.tag == "Platform") {
+			transform.parent = null;
+		}
+	}
 }
