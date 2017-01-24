@@ -16,13 +16,25 @@ public class BehaviorsDesigner : MonoBehaviour
 	[Header ("OnTrigger")]
 	public List<BehaviorsLoopsEditor> OnTriggerBehaviors = new List<BehaviorsLoopsEditor> ();
 
-	private Behavior[] behavoirsPrefabs = new Behavior[5];
-
-	void Awake ()
+	void Start ()
 	{
-		GetBehaviors ();
 		CleanAllLoops ();
 		SetupBehaviors ();
+
+		if(GetComponent<OnStart> () != null)
+		{
+			GetComponent<OnStart> ().SetupBehaviors ();
+			GetComponent<OnStart> ().StartBehavior ();
+		}
+
+		if(GetComponent<OnPlayerCollision> () != null)
+			GetComponent<OnPlayerCollision> ().SetupBehaviors ();
+
+		if(GetComponent<OnObjectCollision> () != null)
+			GetComponent<OnObjectCollision> ().SetupBehaviors ();
+
+		if(GetComponent<OnTrigger> () != null)
+			GetComponent<OnTrigger> ().SetupBehaviors ();
 	}
 
 	public void SetupBehaviors ()
@@ -81,54 +93,53 @@ public class BehaviorsDesigner : MonoBehaviour
 				switch (behaviorsLoopsEditor [i].Behaviors [j].Type)
 				{
 				case BehaviorType.Move:
-					
-					behaviorLoopsTarget [i].Behaviors.Add (behavoirsPrefabs [0]);
+
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Move") as Behavior);
 					var moveBehavior = (Move)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					moveBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
 
 					moveBehavior._position = behaviorsLoopsEditor [i].Behaviors [j]._position;
-					moveBehavior._speed = behaviorsLoopsEditor [i].Behaviors [j]._speed;
+					moveBehavior._duration = behaviorsLoopsEditor [i].Behaviors [j]._duration;
 
 					break;
 				case BehaviorType.Scale:
 					
-					behaviorLoopsTarget [i].Behaviors.Add (behavoirsPrefabs [1]);
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Scale") as Behavior);
 					var scaleBehavior = (Scale)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					scaleBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
 
 					scaleBehavior._scale = behaviorsLoopsEditor [i].Behaviors [j]._scale;
-					scaleBehavior._speed = behaviorsLoopsEditor [i].Behaviors [j]._speed;
+					scaleBehavior._duration = behaviorsLoopsEditor [i].Behaviors [j]._duration;
 
 					break;
 				case BehaviorType.Rotate:
 					
-					behaviorLoopsTarget [i].Behaviors.Add (behavoirsPrefabs [2]);
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Rotate") as Behavior);
 					var rotateBehavior = (Rotate)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					rotateBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
 
 					rotateBehavior._rotation = behaviorsLoopsEditor [i].Behaviors [j]._rotation;
-					rotateBehavior._speed = behaviorsLoopsEditor [i].Behaviors [j]._speed;
+					rotateBehavior._duration = behaviorsLoopsEditor [i].Behaviors [j]._duration;
 					break;
 				case BehaviorType.Colorize:
 					
-					behaviorLoopsTarget [i].Behaviors.Add (behavoirsPrefabs [3]);
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Colorize") as Behavior);
 					var colorizeBehavior = (Colorize)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					colorizeBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
 
 					colorizeBehavior._color = behaviorsLoopsEditor [i].Behaviors [j]._color;
-					colorizeBehavior._speed = behaviorsLoopsEditor [i].Behaviors [j]._speed;
+					colorizeBehavior._duration = behaviorsLoopsEditor [i].Behaviors [j]._duration;
 					break;
 				case BehaviorType.Bounce:
 					
-					behaviorLoopsTarget [i].Behaviors.Add (behavoirsPrefabs [4]);
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Bounce") as Behavior);
 					var bounceBehavior = (Bounce)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					bounceBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
-
 					bounceBehavior.physicMat = behaviorsLoopsEditor [i].Behaviors [j].physicMat;
 					break;
 				}
@@ -136,15 +147,6 @@ public class BehaviorsDesigner : MonoBehaviour
 		}
 
 		return behaviorLoopsTarget;
-	}
-
-	void GetBehaviors ()
-	{
-		behavoirsPrefabs [0] = Resources.Load ("Move") as Behavior;
-		behavoirsPrefabs [1] = Resources.Load ("Scale") as Behavior;
-		behavoirsPrefabs [2] = Resources.Load ("Rotate") as Behavior;
-		behavoirsPrefabs [3] = Resources.Load ("Colorize") as Behavior;
-		behavoirsPrefabs [4] = Resources.Load ("Bounce") as Behavior;
 	}
 
 	void CleanAllLoops ()

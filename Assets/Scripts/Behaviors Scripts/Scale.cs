@@ -17,7 +17,7 @@ public class Scale : Behavior
 	[Header ("Settings")]
 	public Transform _transform;
 	public Vector3 _scale;
-	public float _speed;
+	public float _duration;
 
 	[Header ("Wait"), SerializeField]
 	public bool _wait = true;
@@ -32,7 +32,7 @@ public class Scale : Behavior
 		if (_transform == null)
 			Debug.LogWarning ("No Transform !");
 		
-		Tween tween = _transform.DOScale (_scale, _speed).SetSpeedBased ().SetRelative ();
+		Tween tween = _transform.DOScale (_scale, _duration).SetRelative ();
 		tween.SetId ("Behavior" + _transform.gameObject.GetInstanceID ());
 
 		yield return tween.WaitForCompletion ();

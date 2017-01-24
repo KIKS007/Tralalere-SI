@@ -16,7 +16,7 @@ public class Colorize : Behavior
 	[Header ("Settings")]
 	public GameObject _gameObject;
 	public Color _color;
-	public float _speed;
+	public float _duration;
 
 	[Header ("Wait"), SerializeField]
 	public bool _wait = true;
@@ -34,16 +34,16 @@ public class Colorize : Behavior
 		Tween tween = null;
 
 		if (_gameObject.GetComponent<Renderer> () != null)
-			tween = _gameObject.GetComponent<Renderer>().material.DOColor (_color, _speed).SetSpeedBased ();
+			tween = _gameObject.GetComponent<Renderer>().material.DOColor (_color, _duration);
 
 		else if (_gameObject.transform.GetChild (0).GetComponent<Renderer> () != null)
-			tween = _gameObject.transform.GetChild (0).GetComponent<Renderer>().material.DOColor (_color, _speed).SetSpeedBased ();
+			tween = _gameObject.transform.GetChild (0).GetComponent<Renderer>().material.DOColor (_color, _duration);
 
 		else if (_gameObject.GetComponent<Light> () != null)
-			tween = _gameObject.GetComponent<Light>().DOColor (_color, _speed).SetSpeedBased ();
+			tween = _gameObject.GetComponent<Light>().DOColor (_color, _duration);
 	
 		else if (_gameObject.transform.GetChild (0).GetComponent<Light> () != null)
-			tween = _gameObject.transform.GetChild (0).GetComponent<Light>().DOColor (_color, _speed).SetSpeedBased ();
+			tween = _gameObject.transform.GetChild (0).GetComponent<Light>().DOColor (_color, _duration);
 
 		if(tween != null)
 		{

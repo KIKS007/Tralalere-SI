@@ -4,10 +4,10 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 
-public class Move : Behavior 
+public class Delay : Behavior 
 {
 	[HideInInspector]
-	public string _name = "Move";
+	public string _name = "Delay";
 	public override string Name
 	{
 		get { return _name; }
@@ -15,8 +15,6 @@ public class Move : Behavior
 	}
 
 	[Header ("Settings")]
-	public Rigidbody _rigidbody;
-	public Vector3 _position;
 	public float _duration;
 
 	[Header ("Wait"), SerializeField]
@@ -29,15 +27,6 @@ public class Move : Behavior
 
 	public override IEnumerator Play ()
 	{
-		if (_rigidbody == null)
-			Debug.LogWarning ("No Rigidbody !");
-
-		_rigidbody.useGravity = false;
-
-		Tween tween = _rigidbody.DOMove (_position, _duration).SetRelative ();
-		tween.SetId ("Behavior" + _rigidbody.gameObject.GetInstanceID ());
-		tween.OnComplete (()=> _rigidbody.useGravity = true);
-
-		yield return tween.WaitForCompletion ();
+		yield return new WaitForSeconds (_duration);
 	}
 }

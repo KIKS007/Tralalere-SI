@@ -16,7 +16,7 @@ public class Rotate : Behavior
 	[Header ("Settings")]
 	public Rigidbody _rigidbody;
 	public Vector3 _rotation;
-	public float _speed;
+	public float _duration;
 
 	[Header ("Wait"), SerializeField]
 	public bool _wait = true;
@@ -31,7 +31,7 @@ public class Rotate : Behavior
 		if (_rigidbody == null)
 			Debug.LogWarning ("No Rigidbody !");
 
-		Tween tween = _rigidbody.DORotate (_rotation, _speed).SetSpeedBased ().SetRelative ();
+		Tween tween = _rigidbody.DORotate (_rotation, _duration).SetRelative ();
 		tween.SetId ("Behavior" + _rigidbody.gameObject.GetInstanceID ());
 
 		yield return tween.WaitForCompletion ();
