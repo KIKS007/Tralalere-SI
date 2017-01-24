@@ -38,7 +38,10 @@ public class Bounce : Behavior
 		else
 			col = _gameObject.GetComponent<Collider> ();
 
-		col.material = physicMat;
+		if(physicMat != null)
+			col.material = physicMat;
+		else
+			Debug.LogWarning ("No Physic Material !");
 
 		yield return null;
 	}

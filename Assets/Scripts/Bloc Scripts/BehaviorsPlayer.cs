@@ -29,6 +29,7 @@ public class BehaviorsPlayer : MonoBehaviour
 	{
 		KillBehaviors ();
 		transform.position = initialPosition;
+		GetComponent<Rigidbody> ().velocity = Vector3.zero;
 
 		if (GetComponent<Collider> () != null)
 			GetComponent<Collider> ().material = null;
@@ -43,6 +44,12 @@ public class BehaviorsPlayer : MonoBehaviour
 		{
 			for(int i = 0; i < behaviorLoop.Behaviors.Count; i++)
 			{
+				if(behaviorLoop.Behaviors[i] == null)
+				{
+					Debug.LogWarning ("Behavior Is NULL");
+					return;
+				}
+
 				if(behaviorLoop.Behaviors[i].GetType().GetField("_gameObject", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) != null)
 					behaviorLoop.Behaviors[i].GetType().GetField("_gameObject", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(behaviorLoop.Behaviors[i], gameObject);
 				

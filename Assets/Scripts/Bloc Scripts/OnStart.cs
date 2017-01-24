@@ -10,7 +10,7 @@ public class OnStart : BehaviorsPlayer
 
 		if (debugMode)
 			Debug.Log ("OnStart : " + name);
-		
+
 		StartCoroutine (PlayBehaviors (BehaviorLoops));
 	}
 }

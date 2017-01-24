@@ -31,9 +31,12 @@ public class Move : Behavior
 	{
 		if (_rigidbody == null)
 			Debug.LogWarning ("No Rigidbody !");
-		
+
+		_rigidbody.useGravity = false;
+
 		Tween tween = _rigidbody.DOMove (_position, _speed).SetSpeedBased ().SetRelative ();
 		tween.SetId ("Behavior" + _rigidbody.gameObject.GetInstanceID ());
+		tween.OnComplete (()=> _rigidbody.useGravity = true);
 
 		yield return tween.WaitForCompletion ();
 	}
