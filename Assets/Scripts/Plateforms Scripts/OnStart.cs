@@ -24,7 +24,6 @@ public class OnStart : BehaviorsPlayer
 		if (debugMode)
 			Debug.Log ("Start : " + name);
 
-		Debug.Log (BehaviorLoops.Count);
 		StartCoroutine (PlayBehaviors (BehaviorLoops));		
 	}
 }
