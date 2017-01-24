@@ -19,8 +19,7 @@ public class CCC : MonoBehaviour
     public float TopAngleLimit = 90f;
     public LayerMask Ground;
 
-	public float BoostRunSpeed = 10f;
-	public bool BoostEnabled = false;
+
 
 	Player player;
     Transform _cam, _groundCheck;
@@ -33,7 +32,7 @@ public class CCC : MonoBehaviour
     bool _isGrounded = false;
     bool _canJump = true;
 	int _jumpCounter = 0;
-	Vector3 _lastCheckpoint;
+	Vector3 _lastCheckpoint = Vector3.zero;
 
     //setup the references
     void Awake()
@@ -82,9 +81,7 @@ public class CCC : MonoBehaviour
         //MOVEMENT-----------------------------------------------
 		_speed = transform.forward * player.GetAxisRaw ("Move Vertical") + transform.right * player.GetAxisRaw ("Move Horizontal");
 		_speed.Normalize ();
-
-		float speedFactor = BoostEnabled ? BoostRunSpeed : RunSpeed;
-		_speed *= speedFactor;
+		_speed *= RunSpeed;
 
 		_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
 		if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
@@ -106,7 +103,7 @@ public class CCC : MonoBehaviour
 
 		//TESTING STUFF-----------------------------------------
 		if (Input.GetKey(KeyCode.T)) {
-			GoToCheckpoint();
+			
 		}
     }
 
@@ -170,30 +167,25 @@ public class CCC : MonoBehaviour
 	void OnCollisionEnter (Collision collision) {
 		if (collision.collider.tag == "Platform") {
 			RaycastHit hit;
-
-			if (Physics.Raycast(_groundCheck.position, Vector3.down, out hit)) {
-				if (hit.collider.tag == "Platform") {
-					transform.parent = collision.collider.transform.GetChild (0).transform;
+			Collider[] _sphereHit = Physics.OverlapSphere (_groundCheck.position, GroundCheckRadius);
+			if (_sphereHit.Length != 0) {
+				for (int i = 0; i < _sphereHit.Length; i++)
+				{
+					if (_sphereHit[i].tag == "Platform") {
+						transform.parent = _sphereHit[i].transform.GetChild (0).transform;
+						i = _sphereHit.Length;
+					}
 				}
 			}
-
-			if(collision.gameObject.layer == LayerMask.NameToLayer ("Boost"))
-			{
-				BoostEnabled = true;
-				Debug.Log ("Enter Boost");
-			}
+		}
+		else if (collision.collider.tag == "Death") {
+			GoToCheckpoint ();
 		}
 	}
 
 	void OnCollisionExit (Collision collision) {
 		if (collision.collider.tag == "Platform") {
 			transform.parent = null;
-		}
-
-		if(collision.gameObject.layer == LayerMask.NameToLayer ("Boost"))
-		{
-			BoostEnabled = false;
-			Debug.Log ("Exit Boost");
 		}
 	}
 

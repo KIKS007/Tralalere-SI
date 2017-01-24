@@ -9,10 +9,13 @@ public class StartingPoint : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
+		
 		if (IsStartingPoint) {
-			GameObject _newPlayer = Instantiate(PlayerPrefab, transform.GetChild(0).GetChild(0).position, Quaternion.identity) as GameObject;
+			if (GameObject.FindGameObjectsWithTag ("Player").Length == 0) {
+				GameObject _newPlayer = Instantiate(PlayerPrefab, transform.GetChild(0).GetChild(0).position, Quaternion.identity) as GameObject;
+			}
 		}
+
 	}
 
 }

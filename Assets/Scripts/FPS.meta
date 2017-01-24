@@ -1,7 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 09dfd9a25d55c3d4eb548f9d3838805b
 folderAsset: yes
 timeCreated: 1485261384
+=======
+guid: 11fc4e600fff7d64eac2fc9bfb858599
+folderAsset: yes
+timeCreated: 1485272568
+>>>>>>> fpsCCC
 licenseType: Pro
 DefaultImporter:
   userData: 

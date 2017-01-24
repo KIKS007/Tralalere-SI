@@ -1,6 +1,10 @@
 fileFormatVersion: 2
 guid: 45dbaeb0706d31e4cbe9255c2fd9794e
+<<<<<<< HEAD
 timeCreated: 1485265382
+=======
+timeCreated: 1485180831
+>>>>>>> fpsCCC
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
