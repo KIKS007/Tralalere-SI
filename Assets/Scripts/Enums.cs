@@ -8,6 +8,8 @@ public enum BehaviorType
 	Scale,
 	Rotate,
 	Colorize,
-	Bounce
+	Bounce,
+	Delay,
+	Boost
 }
 

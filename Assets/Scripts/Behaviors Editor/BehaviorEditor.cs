@@ -12,10 +12,11 @@ public class BehaviorEditor
 	public bool Wait = true;
 
 	[Header ("Settings")]
+	public float _duration;
 	public Vector3 _position;
 	public Vector3 _rotation;
 	public Vector3 _scale;
 	public Color _color;
-	public float _duration;
+	public float _boostSpeed;
 	public PhysicMaterial physicMat;
 }

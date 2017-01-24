@@ -7,9 +7,9 @@ public class CreateScriptableObject
 	[MenuItem ("Assets/Create/Behavior")]
 	public static void CreateMyAsset ()
 	{
-		Bounce asset = ScriptableObject.CreateInstance<Bounce> ();
+		Boost asset = ScriptableObject.CreateInstance<Boost> ();
 
-		AssetDatabase.CreateAsset (asset, "Assets/Scripts/Behaviors Objects/" + asset.Name + ".asset");
+		AssetDatabase.CreateAsset (asset, "Assets/Scripts/Resources/" + asset.Name + ".asset");
 		AssetDatabase.SaveAssets ();
 
 		EditorUtility.FocusProjectWindow ();

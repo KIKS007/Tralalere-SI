@@ -142,6 +142,26 @@ public class BehaviorsDesigner : MonoBehaviour
 					bounceBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
 					bounceBehavior.physicMat = behaviorsLoopsEditor [i].Behaviors [j].physicMat;
 					break;
+
+				case BehaviorType.Delay:
+
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Delay") as Behavior);
+					var delayBehavior = (Delay)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
+
+					delayBehavior._duration = behaviorsLoopsEditor [i].Behaviors [j]._duration;
+					delayBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
+					break;
+
+
+				case BehaviorType.Boost:
+
+					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Boost") as Behavior);
+					var boostBehavior = (Boost)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
+
+					boostBehavior._boostSpeed = behaviorsLoopsEditor [i].Behaviors [j]._boostSpeed;
+					boostBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
+					break;
+			
 				}
 			}
 		}

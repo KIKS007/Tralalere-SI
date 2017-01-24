@@ -19,7 +19,8 @@ public class CCC : MonoBehaviour
     public float TopAngleLimit = 90f;
     public LayerMask Ground;
 
-
+	public bool _boostEnabled = false;
+	public float BoostRunSpeed = 10f;
 
 	Player player;
     Transform _cam, _groundCheck;
@@ -81,7 +82,9 @@ public class CCC : MonoBehaviour
         //MOVEMENT-----------------------------------------------
 		_speed = transform.forward * player.GetAxisRaw ("Move Vertical") + transform.right * player.GetAxisRaw ("Move Horizontal");
 		_speed.Normalize ();
-		_speed *= RunSpeed;
+
+		float speedTemp = _boostEnabled ? BoostRunSpeed : RunSpeed;
+		_speed *= speedTemp;
 
 		_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
 		if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
@@ -168,7 +171,8 @@ public class CCC : MonoBehaviour
 		if (collision.collider.tag == "Platform") {
 			RaycastHit hit;
 			Collider[] _sphereHit = Physics.OverlapSphere (_groundCheck.position, GroundCheckRadius);
-			if (_sphereHit.Length != 0) {
+
+			/*if (_sphereHit.Length != 0) {
 				for (int i = 0; i < _sphereHit.Length; i++)
 				{
 					if (_sphereHit[i].tag == "Platform") {
@@ -176,16 +180,27 @@ public class CCC : MonoBehaviour
 						i = _sphereHit.Length;
 					}
 				}
-			}
+			}*/
 		}
-		else if (collision.collider.tag == "Death") {
+
+		if (collision.collider.tag == "Death") {
 			GoToCheckpoint ();
+		}
+
+		if (collision.gameObject.layer == LayerMask.NameToLayer ("Boost"))
+		{
+			_boostEnabled = true;
 		}
 	}
 
 	void OnCollisionExit (Collision collision) {
 		if (collision.collider.tag == "Platform") {
 			transform.parent = null;
+		}
+
+		if (collision.gameObject.layer == LayerMask.NameToLayer ("Boost"))
+		{
+			_boostEnabled = false;
 		}
 	}
 

@@ -26,6 +26,8 @@ public class BehaviorsPlayer : MonoBehaviour
 		transform.position = initialPosition;
 		GetComponent<Rigidbody> ().velocity = Vector3.zero;
 
+		gameObject.layer = LayerMask.NameToLayer ("Default");
+
 		if (GetComponent<Collider> () != null)
 			GetComponent<Collider> ().material = null;
 		
