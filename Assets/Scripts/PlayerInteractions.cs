@@ -40,10 +40,10 @@ public class PlayerInteractions : MonoBehaviour {
 		}
 
 		if (_player.GetButtonUp ("Catch")) {
-			_holdObject.transform.parent = null;
 			_holdObject.useGravity = true;
 			_holdObject.constraints = RigidbodyConstraints.None;
 			_holdObject.gameObject.layer = _holdObjectLayer;
+			_holdObject.transform.parent = null;
 			_holdObject = null;
 		}
 			
