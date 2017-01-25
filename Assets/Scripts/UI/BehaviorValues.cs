@@ -16,18 +16,26 @@ public class BehaviorValues : MonoBehaviour
 
 	private BehaviorType uiBehaviorType;
 
+	[HideInInspector]
 	public InputField _durationInput;
 
+	[HideInInspector]
 	public InputField _xInput;
+	[HideInInspector]
 	public InputField _yInput;
+	[HideInInspector]
 	public InputField _zInput;
 
+	[HideInInspector]
 	public InputField _boostSpeedInput;
 
+	[HideInInspector]
 	public Toggle _enableInput;
 
+	[HideInInspector]
 	public Image _colorInput;
 
+	[HideInInspector]
 	public InputField _loopsCountInput;
 
 	void Awake ()

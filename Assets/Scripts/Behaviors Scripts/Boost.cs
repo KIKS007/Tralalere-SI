@@ -12,6 +12,14 @@ public class Boost : Behavior
 		set { _name = value; }
 	}
 
+	[Header ("Type"), SerializeField]
+	public BehaviorType _behaviorType = BehaviorType.Boost;
+	public override BehaviorType BehaviorType
+	{
+		get { return _behaviorType; }
+		set { _behaviorType = value; }
+	}
+
 	[Header ("Settings")]
 	public GameObject _gameObject;
 	public float _boostSpeed = 15f;

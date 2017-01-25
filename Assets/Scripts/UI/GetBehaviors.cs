@@ -34,7 +34,27 @@ public class GetBehaviors : MonoBehaviour
 		{
 			if(onStart.BehaviorLoops [0].LoopsCount == 1)
 			{
+				Debug.Log ("Loop");
 
+				switch (onStart.BehaviorLoops [0].Behaviors [0].BehaviorType)
+				{
+				case BehaviorType.Boost:
+					Debug.Log ("AddBoost");
+					AddBoost (onStart.BehaviorLoops [0].Behaviors [0], onStartScroll);
+					break;
+				case BehaviorType.Bounce:
+					break;
+				case BehaviorType.Colorize:
+					break;
+				case BehaviorType.Delay:
+					break;
+				case BehaviorType.Move:
+					break;
+				case BehaviorType.Rotate:
+					break;
+				case BehaviorType.Scale:
+					break;
+				}
 			}
 
 			else if(onStart.BehaviorLoops [0].LoopsCount < 0 || onStart.BehaviorLoops [0].LoopsCount > 1)
@@ -44,9 +64,21 @@ public class GetBehaviors : MonoBehaviour
 		}
 	}
 
-	void AddBoost (Boost boost, ScrollManager scroll)
+	void AddBoost (Behavior behavior, ScrollManager scroll)
 	{
 		GameObject clone = _hackingCanvas.AddBehavior (_hackingCanvas.boostPrefab, scroll);
+
+		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
+		Boost behaviorScript = behavior as Boost;
+
+		behaviorValues._boostSpeedInput.text = behaviorScript._boostSpeed.ToString ();
+		behaviorValues._enableInput.isOn = behaviorScript._enable;
+
+		behavior = behaviorScript;
+	}
+
+	void AddBounce ()
+	{
 		
 	}
 }

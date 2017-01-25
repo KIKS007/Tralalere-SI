@@ -14,6 +14,14 @@ public class Move : Behavior
 		set { _name = value; }
 	}
 
+	[Header ("Type"), SerializeField]
+	public BehaviorType _behaviorType = BehaviorType.Move;
+	public override BehaviorType BehaviorType
+	{
+		get { return _behaviorType; }
+		set { _behaviorType = value; }
+	}
+
 	[Header ("Settings")]
 	public Rigidbody _rigidbody;
 	public Transform _transform;

@@ -12,6 +12,14 @@ public class Bounce : Behavior
 		set { _name = value; }
 	}
 
+	[Header ("Type"), SerializeField]
+	public BehaviorType _behaviorType = BehaviorType.Bounce;
+	public override BehaviorType BehaviorType
+	{
+		get { return _behaviorType; }
+		set { _behaviorType = value; }
+	}
+
 	[Header ("Settings")]
 	public GameObject _gameObject;
 	public bool _enable = true;

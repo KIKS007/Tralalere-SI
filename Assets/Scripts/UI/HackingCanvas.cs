@@ -53,9 +53,14 @@ public class HackingCanvas : MonoBehaviour
 		firstSelected.Select ();
 		ShowInvoke (0);
 
-		//GetPlateformBehaviors (test);
 
 		GetInventoryElements ();
+	}
+
+	void Start ()
+	{
+		GetPlateformBehaviors (test);
+		
 	}
 
 	public void ShowInvoke (int whichInvoke)

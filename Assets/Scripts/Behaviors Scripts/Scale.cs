@@ -14,6 +14,14 @@ public class Scale : Behavior
 		set { _name = value; }
 	}
 
+	[Header ("Type"), SerializeField]
+	public BehaviorType _behaviorType = BehaviorType.Scale;
+	public override BehaviorType BehaviorType
+	{
+		get { return _behaviorType; }
+		set { _behaviorType = value; }
+	}
+
 	[Header ("Settings")]
 	public Transform _transform;
 	public Vector3 _scale;
