@@ -14,6 +14,7 @@ public class Bounce : Behavior
 
 	[Header ("Settings")]
 	public GameObject _gameObject;
+	public bool _enable = true;
 	public PhysicMaterial physicMat;
 
 	[Header ("Wait"), SerializeField]
@@ -24,8 +25,11 @@ public class Bounce : Behavior
 		set { _wait = value; }
 	}
 
+
 	public override IEnumerator Play ()
 	{
+		physicMat = Resources.Load ("Bounce") as PhysicMaterial;
+
 		Collider col = null;
 
 		if (_gameObject.GetComponent<Collider> () == null)
@@ -38,10 +42,10 @@ public class Bounce : Behavior
 		else
 			col = _gameObject.GetComponent<Collider> ();
 
-		if(physicMat != null)
+		if(_enable)
 			col.material = physicMat;
 		else
-			Debug.LogWarning ("No Physic Material !");
+			col.material = null;
 
 		yield return null;
 	}

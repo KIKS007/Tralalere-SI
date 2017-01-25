@@ -140,7 +140,7 @@ public class BehaviorsDesigner : MonoBehaviour
 					var bounceBehavior = (Bounce)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					bounceBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
-					bounceBehavior.physicMat = behaviorsLoopsEditor [i].Behaviors [j].physicMat;
+					bounceBehavior._enable = behaviorsLoopsEditor [i].Behaviors [j]._enable;
 					break;
 
 				case BehaviorType.Delay:
@@ -160,6 +160,7 @@ public class BehaviorsDesigner : MonoBehaviour
 
 					boostBehavior._boostSpeed = behaviorsLoopsEditor [i].Behaviors [j]._boostSpeed;
 					boostBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
+					boostBehavior._enable = behaviorsLoopsEditor [i].Behaviors [j]._enable;
 					break;
 			
 				}

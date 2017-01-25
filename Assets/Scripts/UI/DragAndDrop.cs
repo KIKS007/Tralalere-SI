@@ -10,8 +10,8 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	[Header ("Is Dragged")]
 	public bool isDragged = false;
 
-	[Header ("Under Element")]
-	public GameObject underElement;
+	[Header ("Current Scroll Parent")]
+	public ScrollManager scrollManager;
 
 	private RectTransform rect;
 	private Camera mainCamera;
@@ -22,6 +22,8 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 	private float myWidth;
 	private float myHeight;
+
+	public bool down;
 
 	// Use this for initialization
 	void Start () 
@@ -34,9 +36,8 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 		myWidth = (rect.rect.width + 5) / 2;
 		myHeight = (rect.rect.height + 5) / 2;
 
-		Debug.Log (-((hackingCanvas.rect.height / 2) - myHeight) - 250);
-
-		Debug.Log (((hackingCanvas.rect.height / 2) - myHeight) - 250);
+		if (transform.parent.parent.parent.GetComponent<ScrollManager> () != null)
+			scrollManager = transform.parent.parent.parent.GetComponent<ScrollManager> ();
 	}
 
 	void Update ()
@@ -46,13 +47,9 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 			Vector2 pos;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(hackingCanvas.transform as RectTransform, Input.mousePosition, mainCamera, out pos);
 			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 0.6f), lerp);
+
+			BlockRect ();
 		}
-
-		RaycastHit info;
-		if (Physics.Raycast (transform.position, transform.forward, out info, 100f, LayerMask.NameToLayer ("UI")))
-			underElement = info.collider.gameObject;
-
-		BlockRect ();
 	}
 
 	void BlockRect ()
@@ -89,7 +86,9 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 		isDragged = true;
 		currentItemDragged = gameObject;
 
-		RemoveParent ();
+		RemoveFromScroll ();
+
+		StartCoroutine (MoveOtherElements ());
 	}
 
 	public void OnPointerUp (PointerEventData eventData)
@@ -102,6 +101,27 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 	public void CheckDrop ()
 	{
+		ScrollManager scrollTemp = CheckWhichSlot ();
+
+		if(scrollTemp != null)
+		{
+			//Debug.Log (scrollManager);
+			if (scrollManager != null && scrollManager != scrollTemp)
+				RemoveFromScroll ();
+
+			scrollManager = scrollTemp;
+			scrollManager.InsertElement (rect);
+		}
+		else
+		{
+			scrollManager.InsertElement (rect);
+		}
+	}
+
+	ScrollManager CheckWhichSlot ()
+	{
+		ScrollManager scrollManager = null;
+
 		PointerEventData pointer = new PointerEventData(EventSystem.current);
 		pointer.position = Input.mousePosition;
 
@@ -112,14 +132,51 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 		{
 			if(raycastResults [i].gameObject.tag == "Slot")
 			{
-				Debug.Log (raycastResults [i].gameObject);
-				raycastResults [i].gameObject.GetComponent<ScrollManager> ().AddElement (rect);
+				if (raycastResults [i].gameObject.GetComponent<ScrollManager> ())
+				{
+					scrollManager = raycastResults [i].gameObject.GetComponent<ScrollManager> ();
+					break;
+				}
 			}
+		}
+
+		return scrollManager;
+	}
+
+	public void RemoveFromScroll ()
+	{
+		if(scrollManager != null)
+		{
+			scrollManager.RemoveElement (rect);
+			scrollManager.PlaceElements ();
+			
+			scrollManager = null;
+			transform.SetParent (hackingCanvas.transform);			
 		}
 	}
 
-	public void RemoveParent ()
+	IEnumerator MoveOtherElements ()
 	{
-		transform.SetParent (hackingCanvas.transform);
+		if(isDragged)
+		{
+			ScrollManager scrollTemp = CheckWhichSlot ();
+
+			if(scrollTemp != null)
+			{
+				if (scrollManager != null && scrollManager != scrollTemp)
+				{
+					RemoveFromScroll ();
+				}
+
+				scrollManager = scrollTemp;
+				scrollManager.InsertElement (rect, false);
+			}
+			
+			//Debug.Log (scrollTemp);
+			yield return new WaitForSeconds (0.1f);
+			
+			StartCoroutine (MoveOtherElements ());
+		}
+
 	}
 }
