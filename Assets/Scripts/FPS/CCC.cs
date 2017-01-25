@@ -138,7 +138,7 @@ public class CCC : MonoBehaviour
 			}
 			//AirControl
 			else {
-				_speed *= Time.deltaTime;
+				_speed *= Time.fixedDeltaTime;
 				if (Vector2.Angle (new Vector2 (velocity.x, velocity.z), new Vector2 (_speed.x, _speed.z)) <= 90) {
 					float _proj = ((velocity.x * _speed.x) + (velocity.z * _speed.z)) / ((_speed.x * _speed.x) + (_speed.z + _speed.z));
 					_proj *= new Vector2 (_speed.x, _speed.z).magnitude;
@@ -168,23 +168,29 @@ public class CCC : MonoBehaviour
     }
 
 	void OnCollisionEnter (Collision collision) {
-		if (collision.collider.tag == "Platform") {
+		
+		if (collision.collider.tag == "Death") {
+			GoToCheckpoint ();
+		}
+	}
+
+	void OnCollisionStay (Collision collision) {
+		if (collision.collider.tag == "Platform") 
+		{
 			RaycastHit hit;
 			Collider[] _sphereHit = Physics.OverlapSphere (_groundCheck.position, GroundCheckRadius);
 
-			if (_sphereHit.Length != 0) {
+			if (_sphereHit.Length > 0) 
+			{
 				for (int i = 0; i < _sphereHit.Length; i++)
 				{
-					if (_sphereHit[i].tag == "Platform") {
+					if (_sphereHit[i].transform != transform.parent && _sphereHit[i].tag == "Platform") 
+					{
 						transform.parent = _sphereHit[i].transform.parent.parent.transform;
 						i = _sphereHit.Length;
 					}
 				}
 			}
-		}
-
-		if (collision.collider.tag == "Death") {
-			GoToCheckpoint ();
 		}
 
 		if (collision.gameObject.layer == LayerMask.NameToLayer ("Boost"))

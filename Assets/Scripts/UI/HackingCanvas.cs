@@ -36,10 +36,16 @@ public class HackingCanvas : MonoBehaviour
 
 	private Inventory playerInventory;
 
+	private GetBehaviors _getBehaviors;
+	private SetBehaviors _setBehaviors;
+
 	void Awake ()
 	{
 		player = GameObject.FindGameObjectWithTag ("Player");
 		playerInventory = player.GetComponent<Inventory> ();
+
+		_getBehaviors = GetComponent<GetBehaviors> ();
+		_setBehaviors = GetComponent<SetBehaviors> ();
 	}
 
 	void OnEnable ()
@@ -60,37 +66,9 @@ public class HackingCanvas : MonoBehaviour
 		invokesScroll [whichInvoke].SetActive (true);
 	}
 
-	void GetPlateformBehaviors (GameObject plateform)
+	public void GetPlateformBehaviors (GameObject plateform)
 	{
-		OnStart onStart = plateform.GetComponent<OnStart> ();
-		OnPlayerCollision onPlayerCollision = plateform.GetComponent<OnPlayerCollision> ();
-
-		bool beginLoopPlaced = false;
-		bool endLoopPlaced = false;
-
-		//Clear Scrolls
-		onStartScroll.ClearElements ();
-		onPlayerCollisionScroll.ClearElements ();
-
-		if(onStart.BehaviorLoops.Count > 0)
-		{
-			if(onStart.BehaviorLoops [0].LoopsCount == 1)
-			{
-				
-			}
-
-			else if(onStart.BehaviorLoops [0].LoopsCount < 0 || onStart.BehaviorLoops [0].LoopsCount > 1)
-			{
-				
-			}
-		}
-	}
-
-	void AddBoost (Boost boost, ScrollManager scroll)
-	{
-		GameObject clone = AddBehavior (boostPrefab, scroll);
-
-		//clone.
+		_getBehaviors.GetPlatformBehaviors (plateform);
 	}
 
 	public void GetInventoryElements ()
@@ -106,7 +84,7 @@ public class HackingCanvas : MonoBehaviour
 		}
 	}
 
-	GameObject AddBehavior (GameObject prefab, ScrollManager scroll)
+	public GameObject AddBehavior (GameObject prefab, ScrollManager scroll)
 	{
 		GameObject clone = Instantiate (prefab, Vector3.zero, Quaternion.identity, scroll.transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ());
 
