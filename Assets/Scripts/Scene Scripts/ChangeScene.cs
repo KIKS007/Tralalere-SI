@@ -10,30 +10,21 @@ public class ChangeScene : MonoBehaviour {
 	Scene _myScene;
 
 	bool _waitingForASunnyDay = false;
-	int _noBugCounter;
-
-	void Start () {
-		_myScene = SceneManager.GetSceneByName (SceneName);
-		if (!_myScene.IsValid ()) {
-			Debug.LogError ("scene name is not valid");
-		}
-	}
 
 	void Update () {
 		if (_waitingForASunnyDay) {
-			if (_myScene.isLoaded) {
-				_noBugCounter--;
-				if (_noBugCounter == 0) {
-					MovePlayer ();
-					_waitingForASunnyDay = false;
-				}
+			if (SceneMaster.Instance.LoadedScene.Contains (SceneName)) {
+				_myScene = SceneManager.GetSceneByName(SceneName);
+				MovePlayer ();
+				_waitingForASunnyDay = false;
 			}
 		}
 	}
 
 	void OnTriggerEnter (Collider collider) {
 		if (collider.tag == "Player") {
-			if (_myScene.isLoaded) {
+			if (SceneMaster.Instance.LoadedScene.Contains (SceneName)) {
+				_myScene = SceneManager.GetSceneByName(SceneName);
 				MovePlayer ();
 			}
 			else {
@@ -41,7 +32,6 @@ public class ChangeScene : MonoBehaviour {
 					SceneMaster.Instance.SceneWaitLine.Add (SceneName);
 				}
 				_waitingForASunnyDay = true;
-				_noBugCounter = 2;
 			}
 		}
 	}

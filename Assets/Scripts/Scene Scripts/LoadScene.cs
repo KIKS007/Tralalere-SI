@@ -10,12 +10,9 @@ public class LoadScene : MonoBehaviour {
 	void OnTriggerEnter (Collider collider) {
 		if (collider.tag == "Player") {
 			for (int i = 0; i < SceneToBeLoaded.Length; i++) {
-				Scene _currentScene = SceneManager.GetSceneByName (SceneToBeLoaded[i]);
-				if (_currentScene.IsValid ()){
-					if (!_currentScene.isLoaded) {
-						if (!SceneMaster.Instance.SceneWaitLine.Contains (SceneToBeLoaded[i])) {
-							SceneMaster.Instance.SceneWaitLine.Add (SceneToBeLoaded [i]);
-						}
+				if (!SceneMaster.Instance.LoadedScene.Contains (SceneToBeLoaded[i])) {
+					if (!SceneMaster.Instance.SceneWaitLine.Contains (SceneToBeLoaded[i])) {
+						SceneMaster.Instance.SceneWaitLine.Add (SceneToBeLoaded [i]);
 					}
 				}
 			}
