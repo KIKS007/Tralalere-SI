@@ -25,6 +25,7 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 	public bool down;
 
+
 	// Use this for initialization
 	void Start () 
 	{
