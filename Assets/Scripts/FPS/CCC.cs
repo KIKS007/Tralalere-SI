@@ -172,15 +172,15 @@ public class CCC : MonoBehaviour
 			RaycastHit hit;
 			Collider[] _sphereHit = Physics.OverlapSphere (_groundCheck.position, GroundCheckRadius);
 
-			/*if (_sphereHit.Length != 0) {
+			if (_sphereHit.Length != 0) {
 				for (int i = 0; i < _sphereHit.Length; i++)
 				{
 					if (_sphereHit[i].tag == "Platform") {
-						transform.parent = _sphereHit[i].transform.GetChild (0).transform;
+						transform.parent = _sphereHit[i].transform.parent.parent.transform;
 						i = _sphereHit.Length;
 					}
 				}
-			}*/
+			}
 		}
 
 		if (collision.collider.tag == "Death") {

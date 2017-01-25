@@ -15,7 +15,8 @@ public class ScrollManager : MonoBehaviour
 
 	private float gapBetweenElements = 10f;
 
-	private RectTransform content;
+	[HideInInspector]
+	public RectTransform content;
 
 	private float contentHeight;
 
@@ -24,12 +25,12 @@ public class ScrollManager : MonoBehaviour
 	// Use this for initialization
 	void Awake () 
 	{
-		content = transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ();	
-
+		
 	}
 
 	void OnEnable ()
 	{
+		content = transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ();
 		GetElements ();		
 	}
 
@@ -48,6 +49,9 @@ public class ScrollManager : MonoBehaviour
 
 	public void InsertElement (RectTransform element, bool setParent = true)
 	{
+		if(content == null)
+			content = transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ();
+
 		if(setParent)
 			element.SetParent (content.transform);
 
@@ -55,12 +59,14 @@ public class ScrollManager : MonoBehaviour
 		{
 			if(element.position.y > elements [0].position.y + comparaisonOffset)
 			{
+				//Debug.Log ("First");
 				RemoveElement (element);
 				elements.Insert (0, element);
 			}
 			
 			else if(element.position.y < elements [elements.Count - 1].position.y - comparaisonOffset)
 			{
+				//Debug.Log ("Last");
 				RemoveElement (element);
 				elements.Add (element);
 			}
@@ -71,6 +77,7 @@ public class ScrollManager : MonoBehaviour
 				{				
 					if(element.position.y < elements [i].position.y - comparaisonOffset && element.position.y > elements [i + 1].position.y + comparaisonOffset)
 					{
+						//Debug.Log ("Between");
 						RemoveElement (element);
 						elements.Insert (i + 1, element);
 						break;
@@ -80,9 +87,22 @@ public class ScrollManager : MonoBehaviour
 		}
 		else
 		{
+			//Debug.Log ("Add");
 			elements.Add (element);
 		}
 
+
+		PlaceElements ();
+	}
+
+	public void AddElement (RectTransform element)
+	{
+		if(content == null)
+			content = transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ();
+
+		element.SetParent (content.transform);
+
+		elements.Add (element);
 
 		PlaceElements ();
 	}
@@ -101,7 +121,7 @@ public class ScrollManager : MonoBehaviour
 		{
 			Vector2 pos = new Vector2 (_xPos, -elements [i].sizeDelta.y * 0.5f - gapBetweenElements);
 
-			if (!elements [i].gameObject.GetComponent<DragAndDrop> ().isDragged)
+			if (!elements [i].gameObject.GetComponent<DragAndDrop> ().canBeDragged || !elements [i].gameObject.GetComponent<DragAndDrop> ().isDragged)
 			{
 				if(i == 0)
 				{
@@ -123,7 +143,18 @@ public class ScrollManager : MonoBehaviour
 		if(elements.Count > 0)
 		{
 			contentHeight = (elements [0].sizeDelta.y + gapBetweenElements) * elements.Count;
+
+			contentHeight = contentHeight + gapBetweenElements;
+
 			content.sizeDelta = new Vector2 (content.sizeDelta.x, contentHeight);
 		}
+	}
+
+	public void ClearElements ()
+	{
+		for (int i = 0; i < elements.Count; i++)
+			Destroy (elements [i].gameObject);
+
+		elements.Clear ();
 	}
 }

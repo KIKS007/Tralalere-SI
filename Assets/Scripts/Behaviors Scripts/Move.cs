@@ -16,6 +16,7 @@ public class Move : Behavior
 
 	[Header ("Settings")]
 	public Rigidbody _rigidbody;
+	public Transform _transform;
 	public Vector3 _position;
 	public float _duration;
 
@@ -29,14 +30,21 @@ public class Move : Behavior
 
 	public override IEnumerator Play ()
 	{
-		if (_rigidbody == null)
+		if (_transform == null)
 			Debug.LogWarning ("No Rigidbody !");
+
+		bool enablePhysicsEnd = _rigidbody.useGravity;
 
 		_rigidbody.useGravity = false;
 
-		Tween tween = _rigidbody.DOMove (_position, _duration).SetRelative ();
-		tween.SetId ("Behavior" + _rigidbody.gameObject.GetInstanceID ());
-		tween.OnComplete (()=> _rigidbody.useGravity = true);
+		Tween tween = _transform.parent.DOMove (_position, _duration).SetRelative ();
+
+		tween.SetId ("Behavior" + _transform.gameObject.GetInstanceID ());
+		tween.OnComplete (()=> 
+			{
+				if(enablePhysicsEnd)
+					_rigidbody.useGravity = true;
+			});
 
 		yield return tween.WaitForCompletion ();
 	}

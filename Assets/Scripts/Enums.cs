@@ -10,6 +10,9 @@ public enum BehaviorType
 	Colorize,
 	Bounce,
 	Delay,
-	Boost
+	Boost,
+	LoopEnd,
+	LoopBegin,
+	Wait
 }
 

@@ -7,7 +7,11 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 {
 	public static GameObject currentItemDragged;
 
-	[Header ("Is Dragged")]
+	[Header ("Platform Type")]
+	public BehaviorType uiBehaviorType;
+
+	[Header ("Drag")]
+	public bool canBeDragged = true;
 	public bool isDragged = false;
 
 	[Header ("Current Scroll Parent")]
@@ -22,9 +26,6 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 	private float myWidth;
 	private float myHeight;
-
-	public bool down;
-
 
 	// Use this for initialization
 	void Start () 
@@ -51,6 +52,13 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 			BlockRect ();
 		}
+	}
+
+
+
+	public void Test (BehaviorType test)
+	{
+		
 	}
 
 	void BlockRect ()
@@ -84,20 +92,26 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 	public void OnPointerDown (PointerEventData eventData)
 	{
-		isDragged = true;
-		currentItemDragged = gameObject;
-
-		RemoveFromScroll ();
-
-		StartCoroutine (MoveOtherElements ());
+		if(canBeDragged)
+		{
+			isDragged = true;
+			currentItemDragged = gameObject;
+			
+			RemoveFromScroll ();
+			
+			StartCoroutine (MoveOtherElements ());			
+		}
 	}
 
 	public void OnPointerUp (PointerEventData eventData)
 	{
-		isDragged = false;
-		currentItemDragged = null;
-
-		CheckDrop ();
+		if(canBeDragged)
+		{
+			isDragged = false;
+			currentItemDragged = null;
+			
+			CheckDrop ();			
+		}
 	}
 
 	public void CheckDrop ()
