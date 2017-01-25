@@ -15,6 +15,7 @@ public class Rotate : Behavior
 
 	[Header ("Settings")]
 	public Rigidbody _rigidbody;
+	public Transform _transform;
 	public Vector3 _rotation;
 	public float _duration;
 
@@ -28,11 +29,11 @@ public class Rotate : Behavior
 
 	public override IEnumerator Play ()
 	{
-		if (_rigidbody == null)
-			Debug.LogWarning ("No Rigidbody !");
+		if (_transform == null)
+			Debug.LogWarning ("No _transform !");
 
-		Tween tween = _rigidbody.DORotate (_rotation, _duration).SetRelative ();
-		tween.SetId ("Behavior" + _rigidbody.gameObject.GetInstanceID ());
+		Tween tween = _transform.parent.DORotate (_rotation, _duration).SetRelative ();
+		tween.SetId ("Behavior" + _transform.gameObject.GetInstanceID ());
 
 		yield return tween.WaitForCompletion ();
 	}

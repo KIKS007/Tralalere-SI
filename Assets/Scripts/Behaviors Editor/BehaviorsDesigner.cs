@@ -41,7 +41,7 @@ public class BehaviorsDesigner : MonoBehaviour
 	{
 		if (OnStartBehaviors.Count > 0 && GetComponent<OnStart> () == null)
 			Debug.LogWarning ("No OnStart Found !");
-		else
+		else if(GetComponent<OnStart> () != null)
 		{
 			var behaviorPlayer = GetComponent<OnStart> ();
 
@@ -52,7 +52,7 @@ public class BehaviorsDesigner : MonoBehaviour
 
 		if (OnPlayerBehaviors.Count > 0 && GetComponent<OnPlayerCollision> () == null)
 			Debug.LogWarning ("No OnPlayerCollision Found !");
-		else
+		else if(GetComponent<OnPlayerCollision> () != null)
 		{
 			var behaviorPlayer = GetComponent<OnPlayerCollision> ();
 			behaviorPlayer.BehaviorLoops.Clear ();
@@ -62,7 +62,7 @@ public class BehaviorsDesigner : MonoBehaviour
 
 		if (OnObjectBehaviors.Count > 0 && GetComponent<OnObjectCollision> () == null)
 			Debug.LogWarning ("No OnObjectCollision Found !");
-		else
+		else if(GetComponent<OnObjectCollision> () != null)
 		{
 			var behaviorPlayer = GetComponent<OnObjectCollision> ();
 			behaviorPlayer.BehaviorLoops.Clear ();
@@ -72,7 +72,7 @@ public class BehaviorsDesigner : MonoBehaviour
 
 		if (OnTriggerBehaviors.Count > 0 && GetComponent<OnTrigger> () == null)
 			Debug.LogWarning ("No OnTrigger Found !");
-		else
+		else if(GetComponent<OnTrigger> () != null)
 		{
 			var behaviorPlayer = GetComponent<OnTrigger> ();
 			behaviorPlayer.BehaviorLoops.Clear ();

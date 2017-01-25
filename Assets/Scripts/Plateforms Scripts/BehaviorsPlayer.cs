@@ -15,9 +15,18 @@ public class BehaviorsPlayer : MonoBehaviour
 
 	private Vector3 initialPosition;
 
+	private Rigidbody _rigidbody;
+
 	protected virtual void Awake ()
 	{
 		initialPosition = transform.position;
+		_rigidbody = GetComponent<Rigidbody> ();
+	}
+
+	protected virtual void FixedUpdate ()
+	{
+		_rigidbody.velocity = Vector3.zero;
+		_rigidbody.angularVelocity = Vector3.zero;
 	}
 
 	public virtual void ResetBehaviors ()
@@ -148,6 +157,15 @@ public class BehaviorsPlayer : MonoBehaviour
 					}
 				}
 			}
+		}
+	}
+
+	void OnTriggerEnter (Collider other)
+	{
+		if(other.gameObject.tag != "Player")
+		{
+			//Debug.Log ("Kill");
+			KillBehaviors ();
 		}
 	}
 
