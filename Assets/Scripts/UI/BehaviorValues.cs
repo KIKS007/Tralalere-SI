@@ -90,6 +90,8 @@ public class BehaviorValues : MonoBehaviour
 			_zInput = transform.GetChild (6).GetComponent<InputField> ();
 			break;
 		}
+
+		UpdateValues ();
 	}
 
 	public void UpdateValues ()
@@ -97,9 +99,19 @@ public class BehaviorValues : MonoBehaviour
 		switch(uiBehaviorType)
 		{
 		case BehaviorType.Boost:
-			
+			int runSpeed = 7;
+
+			if(GameObject.FindGameObjectWithTag ("Player") != null)
+				runSpeed = (int)GameObject.FindGameObjectWithTag ("Player").GetComponent<CCC> ().RunSpeed;
+
 			_boostSpeed = GetInt (_boostSpeedInput.text);
 			_enable = _enableInput.isOn;
+
+			if(_boostSpeed < runSpeed)
+			{
+				_boostSpeed = runSpeed;
+				_boostSpeedInput.text = _boostSpeed.ToString ();
+			}
 			break;
 		case BehaviorType.Bounce:
 			
@@ -117,6 +129,18 @@ public class BehaviorValues : MonoBehaviour
 		case BehaviorType.LoopBegin:
 			
 			_loopsCount = GetInt (_loopsCountInput.text);
+
+			if(_loopsCount == 0)
+			{
+				_loopsCount = 1;
+				_loopsCountInput.text = _loopsCount.ToString ();
+			}
+			else if(_loopsCount < 0)
+			{
+				_loopsCount = -1;
+				_loopsCountInput.text = _loopsCount.ToString ();
+			}
+
 			break;
 		case BehaviorType.Move:
 			
@@ -160,7 +184,7 @@ public class BehaviorValues : MonoBehaviour
 
 	int GetInt (string text)
 	{
-		if (text == "")
+		if (text == "" || text == "-")
 			return 0;
 		else
 			return int.Parse (text);
@@ -168,7 +192,7 @@ public class BehaviorValues : MonoBehaviour
 
 	float GetFloat (string text)
 	{
-		if (text == "" || text == ".")
+		if (text == "" || text == "." || text == "-")
 			return 0;
 		else
 			return float.Parse (text);

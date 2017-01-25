@@ -16,7 +16,7 @@ public class BehaviorsDesigner : MonoBehaviour
 	[Header ("OnTrigger")]
 	public List<BehaviorsLoopsEditor> OnTriggerBehaviors = new List<BehaviorsLoopsEditor> ();
 
-	void Start ()
+	void Awake ()
 	{
 		CleanAllLoops ();
 		SetupBehaviors ();

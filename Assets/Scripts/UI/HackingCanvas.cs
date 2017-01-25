@@ -30,11 +30,11 @@ public class HackingCanvas : MonoBehaviour
 	public GameObject scalePrefab;
 	public GameObject waitPrefab;
 
-	private GameObject player;
-
+	[Header ("Test")]
+	public bool testGO = false;
 	public GameObject test;
-
-	private Inventory playerInventory;
+	
+	private GameObject player;
 
 	private GetBehaviors _getBehaviors;
 	private SetBehaviors _setBehaviors;
@@ -42,10 +42,12 @@ public class HackingCanvas : MonoBehaviour
 	void Awake ()
 	{
 		player = GameObject.FindGameObjectWithTag ("Player");
-		playerInventory = player.GetComponent<Inventory> ();
 
 		_getBehaviors = GetComponent<GetBehaviors> ();
 		_setBehaviors = GetComponent<SetBehaviors> ();
+
+		inventoryScroll.OnChildCountChange += InventoryDoubledBehavoirs;
+		inventoryScroll.OnBehaviorsChange += InventoryRequiredBehaviors;
 	}
 
 	void OnEnable ()
@@ -53,14 +55,13 @@ public class HackingCanvas : MonoBehaviour
 		firstSelected.Select ();
 		ShowInvoke (0);
 
-
-		GetInventoryElements ();
+		InventoryRequiredBehaviors ();
 	}
 
 	void Start ()
 	{
-		GetPlateformBehaviors (test);
-		
+		if(testGO)
+			GetPlateformBehaviors (test);		
 	}
 
 	public void ShowInvoke (int whichInvoke)
@@ -76,17 +77,31 @@ public class HackingCanvas : MonoBehaviour
 		_getBehaviors.GetPlatformBehaviors (plateform);
 	}
 
-	public void GetInventoryElements ()
+	void InventoryDoubledBehavoirs ()
 	{
-		inventoryScroll.ClearElements ();
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Wait);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Delay);
+	}
 
-		AddBehavior (loopBeginPrefab, inventoryScroll);
-		AddBehavior (loopEndPrefab, inventoryScroll);
+	void InventoryRequiredBehaviors ()
+	{
+		bool delay = false;
+		bool wait = false;
 
-		for (int i = 0; i < playerInventory.elements.Count; i++)
+		for(int i = 0; i < inventoryScroll.elements.Count; i++)
 		{
-			
+			if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Delay)
+				delay = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Wait)
+				wait = true;
 		}
+
+		if (!wait)
+			AddBehavior (waitPrefab, inventoryScroll);
+
+		if (!delay)
+			AddBehavior (delayPrefab, inventoryScroll);
 	}
 
 	public GameObject AddBehavior (GameObject prefab, ScrollManager scroll)
