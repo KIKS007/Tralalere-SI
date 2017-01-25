@@ -28,6 +28,17 @@ public class PlayerInteractions : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		if (_player.GetButtonDown ("Start")) {
+			if (!Pause) {
+				Pause = true;
+				Cursor.lockState = CursorLockMode.None;
+			}
+			else {
+				Pause = false;
+				Cursor.lockState = CursorLockMode.Confined;
+			}
+		}
+
 		if (!Pause && !CrackMode) {
 			RaycastHit hit;
 			if (Physics.Raycast (_camera.position, _camera.forward, out hit, GrabDistance)) {
