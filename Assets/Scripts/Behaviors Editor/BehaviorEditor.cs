@@ -17,6 +17,6 @@ public class BehaviorEditor
 	public Vector3 _rotation;
 	public Vector3 _scale;
 	public Color _color;
+	public bool _enable = true;
 	public float _boostSpeed;
-	public PhysicMaterial physicMat;
 }

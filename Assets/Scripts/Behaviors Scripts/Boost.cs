@@ -15,6 +15,7 @@ public class Boost : Behavior
 	[Header ("Settings")]
 	public GameObject _gameObject;
 	public float _boostSpeed = 15f;
+	public bool _enable = true;
 
 	[Header ("Wait"), SerializeField]
 	public bool _wait = true;
@@ -26,10 +27,21 @@ public class Boost : Behavior
 
 	public override IEnumerator Play ()
 	{
-		_gameObject.layer = LayerMask.NameToLayer ("Boost");
 
 		if (GameObject.FindGameObjectWithTag ("Player") != null)
-			GameObject.FindGameObjectWithTag ("Player").GetComponent<CCC> ().BoostRunSpeed = _boostSpeed;
+		{
+			if(_enable)
+			{
+				GameObject.FindGameObjectWithTag ("Player").GetComponent<CCC> ().BoostRunSpeed = _boostSpeed;
+				_gameObject.layer = LayerMask.NameToLayer ("Boost");
+				
+			}
+
+			else
+			{
+				_gameObject.layer = LayerMask.NameToLayer ("Ground");
+			}
+		}
 
 		else
 			Debug.LogWarning ("No Player !!!");
