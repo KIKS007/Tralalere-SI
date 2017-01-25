@@ -19,7 +19,7 @@ public class ScrollManager : MonoBehaviour
 
 	private float contentHeight;
 
-	private float comparaisonOffset = 0.1f;
+	private float comparaisonOffset = 0f;
 
 	// Use this for initialization
 	void Awake () 
@@ -48,8 +48,6 @@ public class ScrollManager : MonoBehaviour
 
 	public void InsertElement (RectTransform element, bool setParent = true)
 	{
-		RemoveElement (element);
-
 		if(setParent)
 			element.SetParent (content.transform);
 
@@ -57,11 +55,13 @@ public class ScrollManager : MonoBehaviour
 		{
 			if(element.position.y > elements [0].position.y + comparaisonOffset)
 			{
+				RemoveElement (element);
 				elements.Insert (0, element);
 			}
 			
 			else if(element.position.y < elements [elements.Count - 1].position.y - comparaisonOffset)
 			{
+				RemoveElement (element);
 				elements.Add (element);
 			}
 			
@@ -71,6 +71,7 @@ public class ScrollManager : MonoBehaviour
 				{				
 					if(element.position.y < elements [i].position.y - comparaisonOffset && element.position.y > elements [i + 1].position.y + comparaisonOffset)
 					{
+						RemoveElement (element);
 						elements.Insert (i + 1, element);
 						break;
 					}

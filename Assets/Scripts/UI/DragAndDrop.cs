@@ -163,14 +163,16 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 			if(scrollTemp != null)
 			{
-				//Debug.Log (scrollManager);
 				if (scrollManager != null && scrollManager != scrollTemp)
+				{
 					RemoveFromScroll ();
+				}
 
 				scrollManager = scrollTemp;
 				scrollManager.InsertElement (rect, false);
 			}
 			
+			//Debug.Log (scrollTemp);
 			yield return new WaitForSeconds (0.1f);
 			
 			StartCoroutine (MoveOtherElements ());
