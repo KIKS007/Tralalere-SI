@@ -9,6 +9,7 @@ public class CCC : MonoBehaviour
 {
 	public float CameraSpeed = 1f;
 	public float RunSpeed = 5f;
+	public float SprintSpeed = 10f;
 	public float JumpForce = 5f;
 	public float Gravity = 19.81f;
 	public float AirControl = 1f;
@@ -31,22 +32,18 @@ public class CCC : MonoBehaviour
 	Vector3 _speed;
 	bool _isMoving = false;
 	bool _isGrounded = false;
+	bool _isSprinting = false;
 	bool _canJump = true;
 	int _jumpCounter = 0;
 	Vector3 _lastCheckpoint = Vector3.zero;
 
-	//setup the references
-	void Awake()
+	// Use this for initialization
+	void Start()
 	{
 		player = ReInput.players.GetPlayer(0);
 		_cam = transform.GetChild(0);
 		_groundCheck = transform.GetChild(1);
 		_body = GetComponent<Rigidbody>();
-	}
-
-	// Use this for initialization
-	void Start()
-	{
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.lockState = CursorLockMode.Locked;
 		_yRotation = _body.rotation.eulerAngles.y;
@@ -55,6 +52,11 @@ public class CCC : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+		if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
+			_canJump = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+		}
+
 		//ROTATION-------------------------------------------
 
 		//we store the input used for rotation
@@ -83,13 +85,18 @@ public class CCC : MonoBehaviour
 		_speed = transform.forward * player.GetAxisRaw ("Move Vertical") + transform.right * player.GetAxisRaw ("Move Horizontal");
 		_speed.Normalize ();
 
-		float speedTemp = _boostEnabled ? BoostRunSpeed : RunSpeed;
-		_speed *= speedTemp;
-
-		_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
-		if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
-			_canJump = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+		if (player.GetButton ("Sprint") && _isGrounded)
+		{
+			_isSprinting = true;
 		}
+		else {
+			_isSprinting = false;
+		}
+
+		float speedTemp = _isSprinting ? SprintSpeed : RunSpeed;
+
+		speedTemp = _boostEnabled ? (BoostRunSpeed + speedTemp) : speedTemp;
+		_speed *= speedTemp;
 
 		//JUMP--------------------------------------------------
 		if (player.GetButton ("Jump") && _canJump)
