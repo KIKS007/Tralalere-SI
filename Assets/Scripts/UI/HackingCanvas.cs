@@ -132,27 +132,18 @@ public class HackingCanvas : MonoBehaviour
 
 	public void ShowInvoke (int whichInvoke)
 	{
-		if(currentPlatform != null)
-			SetPlatformsBehaviors (currentPlatform);
 
 		for (int i = 0; i < invokesScroll.Length; i++)
 			invokesScroll [i].SetActive (false);
 
 		invokesScroll [whichInvoke].SetActive (true);
 
+
 		if(currentPlatform != null)
 			GetPlatformBehaviors (currentPlatform);
 
 		if(currentPlatform != null)
 			SetPlatformsBehaviors (currentPlatform);
-
-		DOVirtual.DelayedCall (1, ()=> {
-			for (int i = 0; i < onPlayerCollisionScroll.elements.Count; i++)
-				Debug.Log (onPlayerCollisionScroll.elements [i]);
-		});
-
-		for (int i = 0; i < onPlayerCollisionScroll.elements.Count; i++)
-			Debug.Log (onPlayerCollisionScroll.elements [i].anchoredPosition);
 	}
 
 	public void GetPlatformBehaviors (GameObject plateform)
