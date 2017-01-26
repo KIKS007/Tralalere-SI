@@ -9,7 +9,11 @@ public class PlayerInteractions : MonoBehaviour {
 	public bool Pause = false;
 	public bool CrackMode = false;
 
+	public LayerMask layer;
+
 	float GrabDistance = 3f;
+
+	public HackingCanvas _hackingCanvas;
 
 	Rigidbody _holdObject;
 	Quaternion _holdObjectRotation;
@@ -28,42 +32,77 @@ public class PlayerInteractions : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if (_player.GetButtonDown ("Start")) {
+		if (_player.GetButtonDown ("Pause")) {
 			if (!Pause) {
 				Pause = true;
+				gameObject.GetComponent <CCC>().Pause = true;
 				Cursor.lockState = CursorLockMode.None;
+				_hackingCanvas.ToggleCanvasPause();
 			}
 			else {
 				Pause = false;
-				Cursor.lockState = CursorLockMode.Confined;
+				gameObject.GetComponent <CCC>().Pause = false;
+				Cursor.lockState = CursorLockMode.None;
+				Cursor.lockState = CursorLockMode.Locked;
+				_hackingCanvas.ToggleCanvasPause();
 			}
 		}
 
-		if (!Pause && !CrackMode) {
-			RaycastHit hit;
-			if (Physics.Raycast (_camera.position, _camera.forward, out hit, GrabDistance)) {
-				if (hit.transform.tag == "Object") {
-					if (_player.GetButtonDown ("Catch")) {
-						_holdObject = hit.transform.gameObject.GetComponent<Rigidbody> ();
-						_holdObject.useGravity = false;
-						_holdObject.constraints = RigidbodyConstraints.FreezeRotation;
-						_holdObject.transform.parent = _objectSnap;
-						_holdObjectRotation = _holdObject.transform.localRotation;
-						_holdObjectLayer = _holdObject.gameObject.layer;
-						_holdObject.gameObject.layer = 9;
+		if (!Pause) {
+
+			if (!CrackMode) {
+				RaycastHit hit;
+				if (Physics.Raycast (_camera.position, _camera.forward, out hit, GrabDistance)) {
+					if (hit.transform.tag == "Object") {
+						if (_player.GetButtonDown ("Catch")) {
+							_holdObject = hit.transform.gameObject.GetComponent<Rigidbody> ();
+							_holdObject.useGravity = false;
+							_holdObject.constraints = RigidbodyConstraints.FreezeRotation;
+							_holdObject.transform.parent = _objectSnap;
+							_holdObjectRotation = _holdObject.transform.localRotation;
+							_holdObjectLayer = _holdObject.gameObject.layer;
+							_holdObject.gameObject.layer = 9;
+						}
+					}
+				}
+
+				if (_player.GetButtonUp ("Catch")) {
+					if (_holdObject != null) {
+						_holdObject.useGravity = true;
+						_holdObject.constraints = RigidbodyConstraints.None;
+						_holdObject.gameObject.layer = _holdObjectLayer;
+						_holdObject.transform.parent = null;
+						_holdObject = null;
 					}
 				}
 			}
+				
+			if (_player.GetButtonDown ("Fire")) {
+				if (!CrackMode && !_hackingCanvas.canvasVisible) {
+					if (gameObject.GetComponent <CCC>()._isGrounded) {
+						RaycastHit hit;
+						if (Physics.Raycast (_camera.position, _camera.forward, out hit, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore)) {
+							//Debug.Log (hit.collider.gameObject.name);
 
-			if (_player.GetButtonUp ("Catch")) {
-				if (_holdObject != null) {
-					_holdObject.useGravity = true;
-					_holdObject.constraints = RigidbodyConstraints.None;
-					_holdObject.gameObject.layer = _holdObjectLayer;
-					_holdObject.transform.parent = null;
-					_holdObject = null;
+							if (hit.collider.attachedRigidbody == null)
+								return;
+							
+							_hackingCanvas.ToggleCanvasVisibility (hit.collider.attachedRigidbody.gameObject);
+							CrackMode = true;
+							gameObject.GetComponent <CCC>().CrackMode = true;
+							Cursor.lockState = CursorLockMode.None;
+						}
+					}
+				}
+				else if(_hackingCanvas.canvasVisible){
+					CrackMode = false;
+					gameObject.GetComponent <CCC>().CrackMode = false;
+					Cursor.lockState = CursorLockMode.None;
+					Cursor.lockState = CursorLockMode.Locked;
+					_hackingCanvas.ToggleCanvasVisibility();
 				}
 			}
+				
 		}
 	
 	}

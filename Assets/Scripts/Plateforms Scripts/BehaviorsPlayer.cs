@@ -8,6 +8,7 @@ using System;
 public class BehaviorsPlayer : MonoBehaviour 
 {
 	public static List<BehaviorsPlayer> allPlatforms = new List<BehaviorsPlayer> ();
+	public static List<OnStart> allStartPlatforms = new List<OnStart> ();
 
 	[Header ("Behaviors Loops")]
 	public List<BehaviorsLoops> BehaviorLoops = new List<BehaviorsLoops> ();
@@ -26,6 +27,9 @@ public class BehaviorsPlayer : MonoBehaviour
 	{
 		if (!allPlatforms.Contains (this))
 			allPlatforms.Add (this);
+
+		if (!allStartPlatforms.Contains (GetComponent<OnStart> ()))
+			allStartPlatforms.Add (GetComponent<OnStart> ());
 		
 		initialPosition = transform.parent.position;
 		_rigidbody = GetComponent<Rigidbody> ();
@@ -194,5 +198,14 @@ public class BehaviorsPlayer : MonoBehaviour
 	{
 		if (allPlatforms.Contains (this))
 			allPlatforms.Remove (this);
+
+		if (allStartPlatforms.Contains (GetComponent<OnStart> ()))
+			allStartPlatforms.Remove (GetComponent<OnStart> ());
 	}
+
+	public void PauseResume ()
+	{
+		Debug.Log ("Pause/Resume : " + transform.parent.name);
+		DOTween.TogglePause ("Behavior" + gameObject.GetInstanceID ());
+	} 
 }
