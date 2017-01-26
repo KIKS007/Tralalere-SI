@@ -7,155 +7,129 @@ using Rewired;
 
 public class CCC : MonoBehaviour
 {
-
 	public float CameraSpeed = 1f;
-    public float RunSpeed = 5f;
-    public float JumpForce = 5f;
+	public float RunSpeed = 5f;
+	public float JumpForce = 5f;
 	public float Gravity = 19.81f;
 	public float AirControl = 1f;
-    public float GroundCheckRadius = 0.1f;
-    [Range(0f, 90f)]
-    public float BottomAngleLimit = 70f;
-    [Range(0f, 90f)]
-    public float TopAngleLimit = 90f;
-    public LayerMask Ground;
+	public float GroundCheckRadius = 0.1f;
+	[Range(0f, 90f)]
+	public float BottomAngleLimit = 70f;
+	[Range(0f, 90f)]
+	public float TopAngleLimit = 90f;
+	public LayerMask Ground;
 
 	public bool _boostEnabled = false;
 	public float BoostRunSpeed = 10f;
 
-	PlayerInteractions _interaction;
-	//FixedJoint _fixedJoint;
 	Player player;
-    Transform _cam, _groundCheck;
-    Rigidbody _body;
+	Transform _cam, _groundCheck;
+	Rigidbody _body;
 
-	Transform _followedPlat;
-	Vector3 _platLastPosition;
-
-    float _yRotation = 0f;
-    float _xRotation = 0f;
-    Vector3 _speed;
-    bool _isMoving = false;
-    bool _isGrounded = false;
-    bool _canJump = true;
+	float _yRotation = 0f;
+	float _xRotation = 0f;
+	Vector3 _speed;
+	bool _isMoving = false;
+	bool _isGrounded = false;
+	bool _canJump = true;
 	int _jumpCounter = 0;
 	Vector3 _lastCheckpoint = Vector3.zero;
 
-    //setup the references
-    void Awake()
-    {
-		_interaction = GetComponent <PlayerInteractions> ();
-		//_fixedJoint = GetComponent <FixedJoint> ();
+	//setup the references
+	void Awake()
+	{
 		player = ReInput.players.GetPlayer(0);
 		_cam = transform.GetChild(0);
-        _groundCheck = transform.GetChild(1);
-        _body = GetComponent<Rigidbody>();
-    }
+		_groundCheck = transform.GetChild(1);
+		_body = GetComponent<Rigidbody>();
+	}
 
-    // Use this for initialization
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.lockState = CursorLockMode.Locked;
-        _yRotation = _body.rotation.eulerAngles.y;
-    }
+	// Use this for initialization
+	void Start()
+	{
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.lockState = CursorLockMode.Locked;
+		_yRotation = _body.rotation.eulerAngles.y;
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
-		if (!_interaction.Pause) {
+	// Update is called once per frame
+	void Update()
+	{
+		//ROTATION-------------------------------------------
 
-			if (transform.parent != null) {
-				
-			}
+		//we store the input used for rotation
+		float rotx;
+		float roty;
 
-			if (_followedPlat != null) {
-				Vector3 _deplacement = (_followedPlat.GetComponent <Rigidbody>().position - _platLastPosition);
-				transform.position += _deplacement;
-				_platLastPosition = _followedPlat.GetComponent <Rigidbody>().position;
-			}
+		rotx = player.GetAxis("Look Horizontal") * CameraSpeed;
+		roty = -player.GetAxis("Look Vertical") * CameraSpeed;
 
-			if (!_interaction.CrackMode) {
+		//we store the rotation along Y axis
+		//because physics functions have to be called in FixedUpdate
+		//but inputs have to be processed in Update
+		_yRotation += rotx * Mathf.Rad2Deg * Time.deltaTime;
 
-				//ROTATION-------------------------------------------
-				//we store the input used for rotation
-				float rotx;
-				float roty;
+		//since we don't use the rigidbody to rotate the camera along the local X axis
+		//we can directly modify the transform
+		//note also that the camera has no collider attached to it that could interfere with the rigidbody
+		//_cam.Rotate(Vector3.right, roty * Time.deltaTime * Mathf.Rad2Deg * XRotationSpeed, Space.Self);
+		_xRotation += roty * Time.deltaTime * Mathf.Rad2Deg;
+		_xRotation = Mathf.Clamp(_xRotation, -TopAngleLimit, BottomAngleLimit);
+		var rot = _cam.localEulerAngles;
+		rot.x = _xRotation;
+		_cam.localEulerAngles = rot;
 
-				rotx = player.GetAxis("Look Horizontal") * CameraSpeed;
-				roty = -player.GetAxis("Look Vertical") * CameraSpeed;
+		//MOVEMENT-----------------------------------------------
+		_speed = transform.forward * player.GetAxisRaw ("Move Vertical") + transform.right * player.GetAxisRaw ("Move Horizontal");
+		_speed.Normalize ();
 
-				//we store the rotation along Y axis
-				//because physics functions have to be called in FixedUpdate
-				//but inputs have to be processed in Update
-				_yRotation += rotx * Mathf.Rad2Deg * Time.deltaTime;
+		float speedTemp = _boostEnabled ? BoostRunSpeed : RunSpeed;
+		_speed *= speedTemp;
 
-				//since we don't use the rigidbody to rotate the camera along the local X axis
-				//we can directly modify the transform
-				//note also that the camera has no collider attached to it that could interfere with the rigidbody
-				//_cam.Rotate(Vector3.right, roty * Time.deltaTime * Mathf.Rad2Deg * XRotationSpeed, Space.Self);
-				_xRotation += roty * Time.deltaTime * Mathf.Rad2Deg;
-				_xRotation = Mathf.Clamp(_xRotation, -TopAngleLimit, BottomAngleLimit);
-				var rot = _cam.localEulerAngles;
-				rot.x = _xRotation;
-				_cam.localEulerAngles = rot;
+		_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+		if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
+			_canJump = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+		}
 
-				//MOVEMENT-----------------------------------------------
-				_speed = transform.forward * player.GetAxisRaw ("Move Vertical") + transform.right * player.GetAxisRaw ("Move Horizontal");
-				_speed.Normalize ();
-
-				float speedTemp = _boostEnabled ? BoostRunSpeed : RunSpeed;
-				_speed *= speedTemp;
-
-				_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground, QueryTriggerInteraction.Ignore);
-				if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
-					_canJump = _isGrounded;
-				}
-
-				//JUMP--------------------------------------------------
-				if (player.GetButton ("Jump") && _canJump)
-				{
-					//is the player grounded
-					if (_isGrounded)
-					{
-						_body.AddForce(Vector3.up * JumpForce, ForceMode.VelocityChange);
-						_canJump = false;
-						_jumpCounter = 1;
-					}
-
-				}
+		//JUMP--------------------------------------------------
+		if (player.GetButton ("Jump") && _canJump)
+		{
+			//is the player grounded
+			if (_isGrounded)
+			{
+				_body.AddForce(Vector3.up * JumpForce, ForceMode.VelocityChange);
+				_canJump = false;
+				_jumpCounter = 1;
 			}
 
 		}
-			
+
 		//TESTING STUFF-----------------------------------------
 		if (Input.GetKey(KeyCode.T)) {
-			
+
 		}
-    }
+	}
 
-    void FixedUpdate()
-    {
-		if (!_interaction.Pause) {
+	void FixedUpdate()
+	{
+		//ROTATION-----------------------------
 
-			if (!_interaction.CrackMode) {
-				//ROTATION-----------------------------
-				var rot = _body.rotation.eulerAngles;
-				//if the rotation of the rigibody and the desired rotation are approximately the same
-				//we don't need to update the rigidbody
-				//it can happend in 2 cases :
-				//	-	the player doesn't move the mouse along the X axis
-				//	-	the fixedUpdate has been called twice during the same Update
-				//		so no new input has been process so _yRotation didn't change
-				if (!Mathf.Approximately(rot.y, _yRotation))
-				{
-					rot.y = _yRotation;
-					_body.MoveRotation(Quaternion.Euler(rot));
-				}
+		var rot = _body.rotation.eulerAngles;
+		//if the rotation of the rigibody and the desired rotation are approximately the same
+		//we don't need to update the rigidbody
+		//it can happend in 2 cases :
+		//	-	the player doesn't move the mouse along the X axis
+		//	-	the fixedUpdate has been called twice during the same Update
+		//		so no new input has been process so _yRotation didn't change
+		if (!Mathf.Approximately(rot.y, _yRotation))
+		{
+			rot.y = _yRotation;
+			_body.MoveRotation(Quaternion.Euler(rot));
+		}
 
-        var velocity = _body.velocity;
+		var velocity = _body.velocity;
 		if (_speed != Vector3.zero)
-        {
+		{
 			//Deplacement au sol (à modifier)
 			if (_isGrounded) {
 				Vector3 velocityChange = (_speed - velocity);
@@ -171,42 +145,30 @@ public class CCC : MonoBehaviour
 					if (_proj < AirControl) {
 						_body.velocity += _speed;
 					}
-					//AirControl
-					else {
-						_speed *= Time.fixedDeltaTime;
-						if (Vector2.Angle (new Vector2 (velocity.x, velocity.z), new Vector2 (_speed.x, _speed.z)) <= 90) {
-							float _proj = ((velocity.x * _speed.x) + (velocity.z * _speed.z)) / ((_speed.x * _speed.x) + (_speed.z + _speed.z));
-							_proj *= new Vector2 (_speed.x, _speed.z).magnitude;
-							if (_proj < AirControl) {
-								_body.velocity += _speed;
-							}
-						}
-						else {
-							_body.velocity += _speed;
-						}
-					}
-
-					_isMoving = true;
 				}
-				//Stop le player quand il est au sol et qu'il ne fait pas d'input
-				else if (_isGrounded && _isMoving)
-				{
-					_body.velocity = Vector3.zero;
-					_isMoving = false;
+				else {
+					_body.velocity += _speed;
 				}
-
-				_jumpCounter--;
 			}
-				
-			//gravité
-			_body.AddForce(Vector3.down * Gravity, ForceMode.Acceleration);
+
+			_isMoving = true;
+		}
+		//Stop le player quand il est au sol et qu'il ne fait pas d'input
+		else if (_isGrounded && _isMoving)
+		{
+			_body.velocity = Vector3.zero;
+			_isMoving = false;
 		}
 
+		//gravité
+		_body.AddForce(Vector3.down * Gravity, ForceMode.Acceleration);
 
-    }
+
+		_jumpCounter--;
+	}
 
 	void OnCollisionEnter (Collision collision) {
-		
+
 		if (collision.collider.tag == "Death") {
 			GoToCheckpoint ();
 		}
@@ -239,8 +201,7 @@ public class CCC : MonoBehaviour
 
 	void OnCollisionExit (Collision collision) {
 		if (collision.collider.tag == "Platform") {
-			//transform.parent = null;
-			_followedPlat = null;
+			transform.parent = null;
 		}
 
 		if (collision.gameObject.layer == LayerMask.NameToLayer ("Boost"))
@@ -250,7 +211,7 @@ public class CCC : MonoBehaviour
 	}
 
 	void OnTriggerEnter (Collider collider) {
-		if ((collider.tag == "Checkpoint") || (collider.tag == "Start")) {
+		if (collider.tag == "Checkpoint") {
 			_lastCheckpoint = collider.transform.position;
 		}
 	}
