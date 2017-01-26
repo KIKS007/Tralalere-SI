@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class HackingCanvas : MonoBehaviour 
 {
+	[Header ("Current Platform")]
+	public GameObject currentPlatform;
+
 	[Header ("First Selected")]
 	public Button firstSelected;
 
@@ -34,15 +37,11 @@ public class HackingCanvas : MonoBehaviour
 	public bool testGO = false;
 	public GameObject test;
 	
-	private GameObject player;
-
 	private GetBehaviors _getBehaviors;
 	private SetBehaviors _setBehaviors;
 
 	void Awake ()
 	{
-		player = GameObject.FindGameObjectWithTag ("Player");
-
 		_getBehaviors = GetComponent<GetBehaviors> ();
 		_setBehaviors = GetComponent<SetBehaviors> ();
 
@@ -56,12 +55,19 @@ public class HackingCanvas : MonoBehaviour
 		ShowInvoke (0);
 
 		InventoryRequiredBehaviors ();
+
+		if(currentPlatform == null)
+		{
+			onStartScroll.ClearElements ();
+			onPlayerCollisionScroll.ClearElements ();
+		}
 	}
 
 	void Start ()
 	{
 		if(testGO)
-			GetPlateformBehaviors (test);		
+			GetPlatformBehaviors (test);		
+
 	}
 
 	public void ShowInvoke (int whichInvoke)
@@ -72,9 +78,16 @@ public class HackingCanvas : MonoBehaviour
 		invokesScroll [whichInvoke].SetActive (true);
 	}
 
-	public void GetPlateformBehaviors (GameObject plateform)
+	public void GetPlatformBehaviors (GameObject plateform)
 	{
 		_getBehaviors.GetPlatformBehaviors (plateform);
+	}
+
+	public void SetPlatformsBehaviors (GameObject platform)
+	{
+		currentPlatform = platform;
+
+		_setBehaviors.SetPlatformBehaviors ();
 	}
 
 	void InventoryDoubledBehavoirs ()

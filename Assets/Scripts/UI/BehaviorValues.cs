@@ -40,6 +40,13 @@ public class BehaviorValues : MonoBehaviour
 
 	void Awake ()
 	{
+		GetInputs ();
+
+		UpdateValues ();
+	}
+
+	public void GetInputs ()
+	{
 		uiBehaviorType = GetComponent<DragAndDrop> ().uiBehaviorType;
 
 		switch(uiBehaviorType)
@@ -90,8 +97,6 @@ public class BehaviorValues : MonoBehaviour
 			_zInput = transform.GetChild (6).GetComponent<InputField> ();
 			break;
 		}
-
-		UpdateValues ();
 	}
 
 	public void UpdateValues ()

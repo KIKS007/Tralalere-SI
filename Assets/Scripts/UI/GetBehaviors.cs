@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GetBehaviors : MonoBehaviour 
 {
-
 	private HackingCanvas _hackingCanvas;
 
 	private ScrollManager onStartScroll;
@@ -23,10 +22,8 @@ public class GetBehaviors : MonoBehaviour
 		OnStart onStart = plateform.GetComponent<OnStart> ();
 		OnPlayerCollision onPlayerCollision = plateform.GetComponent<OnPlayerCollision> ();
 
-		bool beginLoopPlaced = false;
-		bool endLoopPlaced = false;
-
 		GetLoopsSettings (onStart, onStartScroll);
+		GetLoopsSettings (onPlayerCollision, onPlayerCollisionScroll);
 	}
 
 	void GetLoopsSettings (BehaviorsPlayer behaviorPlayer, ScrollManager scroll)
@@ -72,6 +69,11 @@ public class GetBehaviors : MonoBehaviour
 					AddAllLoopBehaviors (scroll, behaviorPlayer, 1);
 			}
 		}
+		else
+		{
+			AddLoopBegin (scroll);
+			AddLoopEnd (scroll);
+		}
 	}
 
 	void AddAllLoopBehaviors (ScrollManager scroll, BehaviorsPlayer behaviorPlayer, int loop)
@@ -114,22 +116,24 @@ public class GetBehaviors : MonoBehaviour
 
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 
+		behaviorValues.GetInputs ();
+
 		behaviorValues._loopsCountInput.text = behaviorLoop.LoopsCount.ToString ();
 	}
 
 	public void AddLoopBegin (ScrollManager scroll)
 	{
-		GameObject clone = _hackingCanvas.AddBehavior (_hackingCanvas.loopBeginPrefab, scroll);
+		_hackingCanvas.AddBehavior (_hackingCanvas.loopBeginPrefab, scroll);
 	}
 
 	public void AddLoopEnd (ScrollManager scroll)
 	{
-		GameObject clone = _hackingCanvas.AddBehavior (_hackingCanvas.loopEndPrefab, scroll);
+		_hackingCanvas.AddBehavior (_hackingCanvas.loopEndPrefab, scroll);
 	}
 
 	public void AddWait (ScrollManager scroll)
 	{
-		GameObject clone = _hackingCanvas.AddBehavior (_hackingCanvas.waitPrefab, scroll);
+		_hackingCanvas.AddBehavior (_hackingCanvas.waitPrefab, scroll);
 	}
 
 	void AddBoost (Behavior behavior, ScrollManager scroll)
@@ -138,6 +142,8 @@ public class GetBehaviors : MonoBehaviour
 
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Boost behaviorScript = behavior as Boost;
+
+		behaviorValues.GetInputs ();
 
 		behaviorValues._boostSpeedInput.text = behaviorScript._boostSpeed.ToString ();
 		behaviorValues._enableInput.isOn = behaviorScript._enable;
@@ -150,6 +156,8 @@ public class GetBehaviors : MonoBehaviour
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Bounce behaviorScript = behavior as Bounce;
 
+		behaviorValues.GetInputs ();
+
 		behaviorValues._enableInput.isOn = behaviorScript._enable;
 	}
 
@@ -159,6 +167,8 @@ public class GetBehaviors : MonoBehaviour
 
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Colorize behaviorScript = behavior as Colorize;
+
+		behaviorValues.GetInputs ();
 
 		behaviorValues._durationInput.text = behaviorScript._duration.ToString ();
 		behaviorValues._colorInput.color = behaviorScript._color;
@@ -171,6 +181,8 @@ public class GetBehaviors : MonoBehaviour
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Delay behaviorScript = behavior as Delay;
 
+		behaviorValues.GetInputs ();
+
 		behaviorValues._durationInput.text = behaviorScript._duration.ToString ();
 	}
 
@@ -180,6 +192,8 @@ public class GetBehaviors : MonoBehaviour
 
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Move behaviorScript = behavior as Move;
+
+		behaviorValues.GetInputs ();
 
 		behaviorValues._durationInput.text = behaviorScript._duration.ToString ();
 
@@ -195,6 +209,8 @@ public class GetBehaviors : MonoBehaviour
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Rotate behaviorScript = behavior as Rotate;
 
+		behaviorValues.GetInputs ();
+
 		behaviorValues._durationInput.text = behaviorScript._duration.ToString ();
 
 		behaviorValues._xInput.text = behaviorScript._rotation.x.ToString ();
@@ -208,6 +224,8 @@ public class GetBehaviors : MonoBehaviour
 
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
 		Scale behaviorScript = behavior as Scale;
+
+		behaviorValues.GetInputs ();
 
 		behaviorValues._durationInput.text = behaviorScript._duration.ToString ();
 

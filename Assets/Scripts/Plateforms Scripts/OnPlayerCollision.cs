@@ -10,7 +10,9 @@ public class OnPlayerCollision : BehaviorsPlayer
 		{
 			if (debugMode)
 				Debug.Log ("OnPlayerCollision : " + name);
-			
+
+			SetupBehaviors ();
+
 			StartCoroutine (PlayBehaviors (BehaviorLoops));
 		}
 	}
