@@ -51,7 +51,7 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 		{
 			Vector2 pos;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(hackingCanvas.transform as RectTransform, Input.mousePosition, mainCamera, out pos);
-			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 0.6f), lerp);
+			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 1f), lerp);
 
 			if(!isFixed)
 				BlockRect (hackingCanvas);

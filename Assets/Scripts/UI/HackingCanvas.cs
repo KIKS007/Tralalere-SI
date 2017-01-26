@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class HackingCanvas : MonoBehaviour 
 {
@@ -36,7 +37,12 @@ public class HackingCanvas : MonoBehaviour
 	[Header ("Test")]
 	public bool testGO = false;
 	public GameObject test;
-	
+
+	[Header ("UI Camera")]
+	public Camera UICamera;
+	public float canvasTweenDuration = 0.2f;
+	public Ease canvasTweenEase;
+
 	private GetBehaviors _getBehaviors;
 	private SetBehaviors _setBehaviors;
 
@@ -129,4 +135,18 @@ public class HackingCanvas : MonoBehaviour
 
 		return clone;
 	}
+
+
+	/*public void ShowCanvas ()
+	{
+		DOTween.To (()=> UICamera.rect.height, x => UICamera.rect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase);
+
+	}
+
+	public void HideCanvas ()
+	{
+		DOTween.To (()=> UICamera.rect.height, x => UICamera.rect.height = x, 0, canvasTweenDuration).SetEase (canvasTweenEase);
+
+
+	}*/
 }
