@@ -49,6 +49,7 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	{
 		if(isDragged)
 		{
+			Debug.Log ("ERROR LOL <3 NORAGE");
 			Vector2 pos;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(hackingCanvas.transform as RectTransform, Input.mousePosition, mainCamera, out pos);
 			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 1f), lerp);
