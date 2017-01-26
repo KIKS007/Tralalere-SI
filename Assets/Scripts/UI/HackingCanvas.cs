@@ -67,6 +67,8 @@ public class HackingCanvas : MonoBehaviour
 		canvasInitialX = transform.localPosition.x;
 		canvasInitialY = transform.localPosition.y;
 
+		UICamera.gameObject.SetActive (true);
+
 		HideCanvas ();
 	}
 
