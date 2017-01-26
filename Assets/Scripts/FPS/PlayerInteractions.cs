@@ -40,11 +40,7 @@ public class PlayerInteractions : MonoBehaviour {
 				_hackingCanvas.ToggleCanvasPause();
 			}
 			else {
-				Pause = false;
-				gameObject.GetComponent <CCC>().Pause = false;
-				Cursor.lockState = CursorLockMode.None;
-				Cursor.lockState = CursorLockMode.Locked;
-				_hackingCanvas.ToggleCanvasPause();
+				UnPauseGame ();
 			}
 		}
 
@@ -78,7 +74,8 @@ public class PlayerInteractions : MonoBehaviour {
 			}
 				
 			if (_player.GetButtonDown ("Fire")) {
-				if (!CrackMode && !_hackingCanvas.canvasVisible) {
+				if (!CrackMode && !_hackingCanvas.canvasVisible) 
+				{
 					if (gameObject.GetComponent <CCC>()._isGrounded) {
 						RaycastHit hit;
 						if (Physics.Raycast (_camera.position, _camera.forward, out hit, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore)) {
@@ -89,17 +86,15 @@ public class PlayerInteractions : MonoBehaviour {
 							
 							_hackingCanvas.ToggleCanvasVisibility (hit.collider.attachedRigidbody.gameObject);
 							CrackMode = true;
-							gameObject.GetComponent <CCC>().CrackMode = true;
+							gameObject.GetComponent <CCC>().Pause = true;
 							Cursor.lockState = CursorLockMode.None;
 						}
 					}
 				}
-				else if(_hackingCanvas.canvasVisible){
-					CrackMode = false;
-					gameObject.GetComponent <CCC>().CrackMode = false;
-					Cursor.lockState = CursorLockMode.None;
-					Cursor.lockState = CursorLockMode.Locked;
-					_hackingCanvas.ToggleCanvasVisibility();
+
+				else if(_hackingCanvas.canvasVisible)
+				{
+					UnHackGame ();
 				}
 			}
 				
@@ -114,5 +109,21 @@ public class PlayerInteractions : MonoBehaviour {
 			_holdObject.transform.localRotation = _holdObjectRotation;
 		}
 
+	}
+		
+	public void UnPauseGame () {
+		Pause = false;
+		gameObject.GetComponent <CCC>().Pause = false;
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.lockState = CursorLockMode.Locked;
+		_hackingCanvas.ToggleCanvasPause();
+	}
+
+	public void UnHackGame () {
+		CrackMode = false;
+		gameObject.GetComponent <CCC>().Pause = false;
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.lockState = CursorLockMode.Locked;
+		_hackingCanvas.ToggleCanvasVisibility();
 	}
 }

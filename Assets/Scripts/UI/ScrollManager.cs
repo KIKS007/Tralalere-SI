@@ -7,7 +7,7 @@ public class ScrollManager : MonoBehaviour
 {
 	public List<RectTransform> elements = new List<RectTransform> ();
 
-	private float _xPos = 0f;
+	private float _xPos = 30f;
 	private float _initialYPos = 70;
 
 	private float _duration = 0.25f;
@@ -21,6 +21,8 @@ public class ScrollManager : MonoBehaviour
 	private float contentHeight;
 
 	private float comparaisonOffset = 0f;
+
+	public HackingCanvas _hackingCanvas;
 
 	public event EventHandler OnChildCountChange;
 	public event EventHandler OnBehaviorsChange;
@@ -98,14 +100,18 @@ public class ScrollManager : MonoBehaviour
 		PlaceElements ();
 	}
 
-	public void AddElement (RectTransform element)
+	public void AddElement (RectTransform element, bool insertAtZero = false)
 	{
 		if(content == null)
 			content = transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ();
 
 		element.SetParent (content.transform);
 
-		elements.Add (element);
+		if(!insertAtZero)
+			elements.Add (element);
+		else
+			elements.Insert (0, element);
+
 
 		PlaceElements ();
 	}
@@ -169,7 +175,7 @@ public class ScrollManager : MonoBehaviour
 				}
 				else
 				{
-					pos = pos + new Vector2 (_xPos, -(elements [i].sizeDelta.y + gapBetweenElements) * (i));
+					pos = new Vector2 (_xPos, pos.y -(elements [i].sizeDelta.y + gapBetweenElements) * (i));
 					
 					elements [i].DOAnchorPos (pos, _duration).SetEase (_ease);	
 				}				
@@ -192,12 +198,48 @@ public class ScrollManager : MonoBehaviour
 		}
 	}
 
-	public void ClearElements ()
+	public void ClearElements (bool withAnim = false)
 	{
+		if(!withAnim)
+		{
+			if(elements.Count > 0)
+			{
+				for (int i = 0; i < elements.Count; i++)
+					Destroy (elements [i].gameObject);				
+			}
+						
+			elements.Clear ();
+		}
+
+		if(gameObject.activeSelf == true && withAnim)
+			StartCoroutine (ClearElementsCoroutine ());
+	}
+
+	IEnumerator ClearElementsCoroutine ()
+	{
+		for (int i = 0; i < elements.Count; i++)
+			elements [i].DOAnchorPosX (500, 0.1f).SetDelay (i * 0.04f);
+
+		yield return new WaitForSeconds (0.1f + ((elements.Count - 1) * 0.04f));
+
 		for (int i = 0; i < elements.Count; i++)
 			Destroy (elements [i].gameObject);
 
 		elements.Clear ();
+
+		_hackingCanvas.SetPlatformsBehaviors (_hackingCanvas.currentPlatform);
+
+		_hackingCanvas.AddBehavior (_hackingCanvas.loopBeginPrefab, this);
+		_hackingCanvas.AddBehavior (_hackingCanvas.loopEndPrefab, this);
+	}
+
+	public void DuplicateElements (int direction)
+	{
+		for (int i = 0; i < elements.Count; i++)
+		{
+			elements [i].DOAnchorPosX (15 * direction, 0.1f).SetRelative ();
+			elements [i].DOAnchorPosX (-15 * direction, 0.05f).SetRelative ().SetDelay (0.1f);
+		}
 	}
 
 	IEnumerator OnChildrenChange (int childCount)

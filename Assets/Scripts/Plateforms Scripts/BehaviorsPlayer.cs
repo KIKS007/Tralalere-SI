@@ -20,6 +20,8 @@ public class BehaviorsPlayer : MonoBehaviour
 	public bool debugMode = false;
 
 	private Vector3 initialPosition;
+	private Quaternion initialRotation;
+	private Vector3 initialScale;
 
 	private Rigidbody _rigidbody;
 
@@ -32,6 +34,9 @@ public class BehaviorsPlayer : MonoBehaviour
 			allStartPlatforms.Add (GetComponent<OnStart> ());
 		
 		initialPosition = transform.parent.position;
+		initialRotation = transform.localRotation;
+		initialScale = transform.localScale;
+
 		_rigidbody = GetComponent<Rigidbody> ();
 	}
 
@@ -46,9 +51,21 @@ public class BehaviorsPlayer : MonoBehaviour
 		KillBehaviors ();
 
 		if(initialPosition == Vector3.zero)
+		{
 			initialPosition = transform.parent.position;
+			initialRotation = transform.localRotation;
+			initialScale = transform.localScale;
+		}
 
 		transform.parent.position = initialPosition;
+		transform.localRotation = initialRotation;
+		transform.localScale = initialScale;
+
+		transform.localPosition = Vector3.zero;
+		transform.localRotation = Quaternion.Euler (Vector3.zero);
+
+		//Debug.Log (initialPosition);
+
 		GetComponent<Rigidbody> ().velocity = Vector3.zero;
 
 		gameObject.layer = LayerMask.NameToLayer ("Default");
@@ -58,6 +75,11 @@ public class BehaviorsPlayer : MonoBehaviour
 		
 		else if (transform.GetChild (0).GetComponent<Collider> () != null)
 			transform.GetChild (0).GetComponent<Collider> ().material = null;
+	}
+
+	public void RemoveBehaviors ()
+	{
+		BehaviorLoops.Clear ();
 	}
 
 	public void SetupBehaviors ()
@@ -184,6 +206,8 @@ public class BehaviorsPlayer : MonoBehaviour
 	{
 		if(other.gameObject.tag != "Player")
 		{
+			//Debug.Log (other);
+
 			//Debug.Log ("Kill");
 			KillBehaviors ();
 		}
@@ -191,6 +215,9 @@ public class BehaviorsPlayer : MonoBehaviour
 
 	public void KillBehaviors ()
 	{
+		StopAllCoroutines ();
+
+		//DOTween.KillAll ();
 		DOTween.Kill ("Behavior" + gameObject.GetInstanceID ());
 	}
 
@@ -205,7 +232,23 @@ public class BehaviorsPlayer : MonoBehaviour
 
 	public void PauseResume ()
 	{
-		Debug.Log ("Pause/Resume : " + transform.parent.name);
+		//Debug.Log ("Pause/Resume : " + transform.parent.name);
 		DOTween.TogglePause ("Behavior" + gameObject.GetInstanceID ());
 	} 
+
+	public void CleanBehaviorsLoop ()
+	{
+		int size = 0;
+
+		for(int i = 0; i < BehaviorLoops.Count; i++)
+		{
+			if (BehaviorLoops [i].Behaviors.Count != 0)
+				size++;
+		}
+
+		while (BehaviorLoops.Count > size)
+		{
+			BehaviorLoops.RemoveAt (BehaviorLoops.Count - 1);			
+		}
+	}
 }

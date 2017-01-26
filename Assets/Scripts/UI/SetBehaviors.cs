@@ -35,6 +35,9 @@ public class SetBehaviors : MonoBehaviour
 
 		if (onPlayerCollisionScroll.elements.Count > 0)
 			GetScrollBehaviors (onPlayerCollisionScroll, platformOnPlayerCollision);
+
+		platformOnStart.CleanBehaviorsLoop ();
+		platformOnPlayerCollision.CleanBehaviorsLoop ();
 	}
 
 	void GetScrollBehaviors (ScrollManager scroll, BehaviorsPlayer behaviorPlayer)

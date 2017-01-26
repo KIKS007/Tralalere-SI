@@ -39,7 +39,6 @@ public class CCC : MonoBehaviour
 	Vector3 _lastCheckpoint = Vector3.zero;
 
 	public bool Pause = false;
-	public bool CrackMode = false;
 
 	// Use this for initialization
 	void Start()
@@ -63,7 +62,7 @@ public class CCC : MonoBehaviour
 			_canJump = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
 		}
 
-		if (!Pause && !CrackMode) {
+		if (!Pause) {
 
 			//ROTATION-------------------------------------------
 
@@ -128,7 +127,7 @@ public class CCC : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		if (!Pause && !CrackMode) {
+		if (!Pause) {
 				//ROTATION-----------------------------
 				var rot = _body.rotation.eulerAngles;
 				//if the rotation of the rigibody and the desired rotation are approximately the same
@@ -182,7 +181,7 @@ public class CCC : MonoBehaviour
 			//gravité
 			_body.AddForce(Vector3.down * Gravity, ForceMode.Acceleration);
 
-		if (Pause || CrackMode) {
+		if (Pause) {
 			if (_isGrounded) {
 				_body.velocity = Vector3.zero;
 			}

@@ -19,7 +19,7 @@ public class OnStart : BehaviorsPlayer
 
 	public void StartBehavior ()
 	{
-		Debug.Log ("Start");
+		//Debug.Log ("Start");
 
 		ResetBehaviors ();	
 

@@ -68,6 +68,17 @@ public class HackingCanvas : MonoBehaviour
 		inventoryScroll.OnChildCountChange += InventoryDoubledBehavoirs;
 		inventoryScroll.OnBehaviorsChange += InventoryRequiredBehaviors;
 
+		/*onStartScroll.OnBehaviorsChange += () => {
+			if(currentPlatform != null) 
+				SetPlatformsBehaviors (currentPlatform);
+		};
+
+		onPlayerCollisionScroll.OnBehaviorsChange += ()=> {
+			if(currentPlatform != null) 
+				SetPlatformsBehaviors (currentPlatform);
+		};*/
+
+
 		canvasInitialX = transform.localPosition.x;
 		canvasInitialY = transform.localPosition.y;
 
@@ -121,18 +132,43 @@ public class HackingCanvas : MonoBehaviour
 
 	public void ShowInvoke (int whichInvoke)
 	{
+		if(currentPlatform != null)
+			SetPlatformsBehaviors (currentPlatform);
+
 		for (int i = 0; i < invokesScroll.Length; i++)
 			invokesScroll [i].SetActive (false);
 
 		invokesScroll [whichInvoke].SetActive (true);
+
+		if(currentPlatform != null)
+			GetPlatformBehaviors (currentPlatform);
+
+		if(currentPlatform != null)
+			SetPlatformsBehaviors (currentPlatform);
+
+		DOVirtual.DelayedCall (1, ()=> {
+			for (int i = 0; i < onPlayerCollisionScroll.elements.Count; i++)
+				Debug.Log (onPlayerCollisionScroll.elements [i]);
+		});
+
+		for (int i = 0; i < onPlayerCollisionScroll.elements.Count; i++)
+			Debug.Log (onPlayerCollisionScroll.elements [i].anchoredPosition);
 	}
 
-	void GetPlatformBehaviors (GameObject plateform)
+	public void GetPlatformBehaviors (GameObject plateform)
 	{
 		_getBehaviors.GetPlatformBehaviors (plateform);
+
+/*		for (int i = 0; i < onStartScroll.elements.Count; i++)
+			if (onStartScroll.elements [i] == null)
+				onStartScroll.elements.RemoveAt (i);
+
+		for (int i = 0; i < onPlayerCollisionScroll.elements.Count; i++)
+			if (onPlayerCollisionScroll.elements [i] == null)
+				onStartScroll.elements.RemoveAt (i);*/
 	}
 
-	void SetPlatformsBehaviors (GameObject platform)
+	public void SetPlatformsBehaviors (GameObject platform)
 	{
 		currentPlatform = platform;
 
@@ -143,12 +179,26 @@ public class HackingCanvas : MonoBehaviour
 	{
 		inventoryScroll.RemoveDoubleElementType (BehaviorType.Wait);
 		inventoryScroll.RemoveDoubleElementType (BehaviorType.Delay);
+
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Boost);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Bounce);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Colorize);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Move);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Rotate);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Scale);
 	}
 
 	void InventoryRequiredBehaviors ()
 	{
 		bool delay = false;
 		bool wait = false;
+
+		bool bounce = false;
+		bool boost = false;
+		bool colorize = false;
+		bool move = false;
+		bool rotate = false;
+		bool scale = false;
 
 		for(int i = 0; i < inventoryScroll.elements.Count; i++)
 		{
@@ -157,16 +207,53 @@ public class HackingCanvas : MonoBehaviour
 
 			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Wait)
 				wait = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Boost)
+				boost = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Bounce)
+				bounce = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Colorize)
+				colorize = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Move)
+				move = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Rotate)
+				rotate = true;
+
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Scale)
+				scale = true;
 		}
 
 		if (!wait)
-			AddBehavior (waitPrefab, inventoryScroll);
+			AddBehavior (waitPrefab, inventoryScroll, true);
 
 		if (!delay)
-			AddBehavior (delayPrefab, inventoryScroll);
+			AddBehavior (delayPrefab, inventoryScroll, true);
+
+		if (!boost)
+			AddBehavior (boostPrefab, inventoryScroll, true);
+
+		if (!bounce)
+			AddBehavior (bouncePrefab, inventoryScroll, true);
+
+		if (!colorize)
+			AddBehavior (colorizePrefab, inventoryScroll, true);
+
+		if (!move)
+			AddBehavior (movePrefab, inventoryScroll, true);
+
+		if (!rotate)
+			AddBehavior (rotatePrefab, inventoryScroll, true);
+
+		if (!scale)
+			AddBehavior (scalePrefab, inventoryScroll, true);
+
 	}
 
-	public GameObject AddBehavior (GameObject prefab, ScrollManager scroll)
+	public GameObject AddBehavior (GameObject prefab, ScrollManager scroll, bool insertAtZero = false)
 	{
 		GameObject clone = Instantiate (prefab, Vector3.zero, Quaternion.identity, scroll.transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ());
 
@@ -174,7 +261,7 @@ public class HackingCanvas : MonoBehaviour
 		clone.GetComponent<RectTransform> ().localRotation = Quaternion.Euler (Vector3.zero);
 		clone.GetComponent<RectTransform> ().localScale = Vector3.one;
 
-		scroll.AddElement (clone.GetComponent<RectTransform> ());
+		scroll.AddElement (clone.GetComponent<RectTransform> (), insertAtZero);
 
 		return clone;
 	}
@@ -187,7 +274,7 @@ public class HackingCanvas : MonoBehaviour
 
 		Rect canvasRect = UICamera.rect;
 
-		currentPlatform = null;
+		//Debug.Log (plateform);
 
 		if (plateform != null && plateform.tag == "Platform" && plateform.GetComponent<BehaviorsDesigner> () != null)
 			currentPlatform = plateform;
@@ -202,11 +289,17 @@ public class HackingCanvas : MonoBehaviour
 		{
 			armAnim.SetBool ("EditMode", false);
 
+			//Debug.Log (plateform);
 
 			//Get Behaviors
 			if(currentPlatform != null)
 			{
+				//Debug.Log ("Bite");
+				//currentPlatform.GetComponent<BehaviorsPlayer> ().RemoveBehaviors ();
+				//currentPlatform.GetComponent<BehaviorsPlayer> ().ResetBehaviors ();
+
 				_setBehaviors.SetPlatformBehaviors ();
+
 				StartCoroutine (StartBehavior (currentPlatform));
 			}
 
@@ -309,6 +402,42 @@ public class HackingCanvas : MonoBehaviour
 	}
 
 
+	public void Duplicate (int whichScroll)
+	{
+		if (whichScroll == 0)
+		{
+			onPlayerCollisionScroll.ClearElements ();
+
+			for (int i = 0; i < onStartScroll.elements.Count ; i++)
+				AddBehavior (onStartScroll.elements [i].gameObject, onPlayerCollisionScroll);				
+
+			SetPlatformsBehaviors (currentPlatform);
+
+			onStartScroll.DuplicateElements (1);
+
+		}
+		else
+		{
+			onStartScroll.ClearElements ();
+
+			for (int i = 0; i < onPlayerCollisionScroll.elements.Count ; i++)
+				AddBehavior (onPlayerCollisionScroll.elements [i].gameObject, onStartScroll);	
+			
+			SetPlatformsBehaviors (currentPlatform);
+
+			onPlayerCollisionScroll.DuplicateElements (-1);
+		}
+	}
+
+	public void Clean (int whichScroll)
+	{
+		if (whichScroll == 0)
+			onStartScroll.ClearElements (true);
+		else
+			onPlayerCollisionScroll.ClearElements (true);
+
+	}
+
 	void ToggleScrollVisibility ()
 	{
 		//Hide
@@ -324,6 +453,7 @@ public class HackingCanvas : MonoBehaviour
 		else
 		{
 			onStartScroll.gameObject.SetActive (true);
+			onPlayerCollisionScroll.gameObject.SetActive (false);
 			firstSelected.Select ();
 
 			for (int i = 0; i < scrollsButtons.Length; i++)
@@ -343,5 +473,11 @@ public class HackingCanvas : MonoBehaviour
 	public void QuitGame ()
 	{
 		Application.Quit ();
+	}
+
+	public void Reload ()
+	{
+		foreach (OnStart baheviorPlayer in BehaviorsPlayer.allStartPlatforms)
+			baheviorPlayer.ResetBehaviors ();
 	}
 }
