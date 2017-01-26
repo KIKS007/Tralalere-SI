@@ -21,6 +21,8 @@ public class OnStart : BehaviorsPlayer
 	{
 		ResetBehaviors ();	
 
+		SetupBehaviors ();
+
 		if (debugMode)
 			Debug.Log ("Start : " + name);
 
