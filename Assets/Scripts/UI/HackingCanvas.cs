@@ -23,6 +23,9 @@ public class HackingCanvas : MonoBehaviour
 	public ScrollManager onStartScroll;
 	public ScrollManager onPlayerCollisionScroll;
 
+	[Header ("Arm Animator")]
+	public Animator armAnim;
+
 	[Header ("Pause")]
 	public GameObject pauseGroup;
 
@@ -52,7 +55,8 @@ public class HackingCanvas : MonoBehaviour
 	private GetBehaviors _getBehaviors;
 	private SetBehaviors _setBehaviors;
 
-	private bool canvasVisible = false;
+	[HideInInspector]
+	public bool canvasVisible = false;
 	private float canvasInitialX;
 	private float canvasInitialY;
 
@@ -108,6 +112,11 @@ public class HackingCanvas : MonoBehaviour
 
 			ToggleCanvasPause ();
 		}
+
+		armAnim.SetBool ("isHacking", DragAndDrop.oneItemIsDragged);
+
+		if (DragAndDrop.oneItemIsDragged)
+			armAnim.SetBool ("hasModified", true);
 	}
 
 	public void ShowInvoke (int whichInvoke)
@@ -171,7 +180,7 @@ public class HackingCanvas : MonoBehaviour
 	}
 
 
-	public void ToggleCanvasVisibility (GameObject plateform)
+	public void ToggleCanvasVisibility (GameObject plateform = null)
 	{
 		if (!DOTween.IsTweening ("CanvasVisibility"))
 			DOTween.Kill ("CanvasVisibility");
@@ -191,11 +200,22 @@ public class HackingCanvas : MonoBehaviour
 		//Hide
 		if(canvasVisible)
 		{
+			armAnim.SetBool ("EditMode", false);
+
+
 			//Get Behaviors
 			if(currentPlatform != null)
+			{
 				_setBehaviors.SetPlatformBehaviors ();
+				StartCoroutine (StartBehavior (currentPlatform));
+			}
 
-			DOTween.To (() => canvasRect.height, x => canvasRect.height = x, 0.01f, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (() => UICamera.rect = canvasRect).OnComplete (() => canvasVisible = false).SetId ("CanvasVisibility");	
+			DOTween.To (() => canvasRect.height, x => canvasRect.height = x, 0.01f, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (() => UICamera.rect = canvasRect).SetId ("CanvasVisibility").OnComplete (()=> {
+
+				PauseResumePlatforms ();
+				canvasVisible = false;
+			});
+
 			transform.DOLocalMoveX (20, canvasTweenDuration).SetEase (canvasTweenEase);
 			transform.DOLocalMoveY (-20, 0.1f).SetEase (canvasTweenEase).SetDelay (canvasTweenDuration);
 
@@ -205,11 +225,18 @@ public class HackingCanvas : MonoBehaviour
 		//Show
 		else
 		{			
+			PauseResumePlatforms ();
+
+			armAnim.SetBool ("EditMode", true);
+
 			onStartScroll.ClearElements ();
 			onPlayerCollisionScroll.ClearElements ();
 
 			transform.DOLocalMoveY (canvasInitialY, 0.1f).SetEase (canvasTweenEase);
-			DOTween.To (()=> canvasRect.height, x => canvasRect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (()=> UICamera.rect = canvasRect).OnComplete (()=> canvasVisible = true).SetId ("CanvasVisibility");
+			DOTween.To (()=> canvasRect.height, x => canvasRect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (()=> UICamera.rect = canvasRect).SetId ("CanvasVisibility").OnComplete (()=> {				
+				canvasVisible = true;
+			});
+
 			transform.DOLocalMoveX (canvasInitialX, canvasTweenDuration).SetEase (canvasTweenEase);
 
 			if(currentPlatform != null)
@@ -248,6 +275,8 @@ public class HackingCanvas : MonoBehaviour
 		//Hide
 		if(canvasVisible)
 		{
+			armAnim.SetBool ("EditMode", false);
+
 			DOTween.To (() => canvasRect.height, x => canvasRect.height = x, 0.01f, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (() => UICamera.rect = canvasRect).OnComplete (() => canvasVisible = false).SetId ("CanvasVisibility");	
 			transform.DOLocalMoveX (20, canvasTweenDuration).SetEase (canvasTweenEase);
 			transform.DOLocalMoveY (-20, 0.1f).SetEase (canvasTweenEase).SetDelay (canvasTweenDuration);
@@ -257,11 +286,28 @@ public class HackingCanvas : MonoBehaviour
 		//Show
 		else
 		{			
+			armAnim.SetBool ("EditMode", true);
+
 			transform.DOLocalMoveY (canvasInitialY, 0.1f).SetEase (canvasTweenEase);
 			DOTween.To (()=> canvasRect.height, x => canvasRect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (()=> UICamera.rect = canvasRect).OnComplete (()=> canvasVisible = true).SetId ("CanvasVisibility");
 			transform.DOLocalMoveX (canvasInitialX, canvasTweenDuration).SetEase (canvasTweenEase);
 		}
 	}
+
+
+	void PauseResumePlatforms ()
+	{
+		foreach (OnStart baheviorPlayer in BehaviorsPlayer.allStartPlatforms)
+			baheviorPlayer.PauseResume ();
+	}
+
+	IEnumerator StartBehavior (GameObject platform)
+	{
+		yield return new WaitForSeconds (canvasTweenDuration);
+
+		platform.GetComponent<OnStart> ().StartBehavior ();
+	}
+
 
 	void ToggleScrollVisibility ()
 	{

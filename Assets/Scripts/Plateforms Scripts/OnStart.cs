@@ -19,6 +19,8 @@ public class OnStart : BehaviorsPlayer
 
 	public void StartBehavior ()
 	{
+		Debug.Log ("Start");
+
 		ResetBehaviors ();	
 
 		SetupBehaviors ();
