@@ -104,10 +104,7 @@ public class BehaviorValues : MonoBehaviour
 		switch(uiBehaviorType)
 		{
 		case BehaviorType.Boost:
-			int runSpeed = 7;
-
-			if(GameObject.FindGameObjectWithTag ("Player") != null)
-				runSpeed = (int)GameObject.FindGameObjectWithTag ("Player").GetComponent<CCC> ().RunSpeed;
+				int runSpeed = 1;
 
 			_boostSpeed = GetInt (_boostSpeedInput.text);
 			_enable = _enableInput.isOn;

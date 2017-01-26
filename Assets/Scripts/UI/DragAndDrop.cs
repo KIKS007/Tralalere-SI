@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler, IDragHandler
 {
 	public static GameObject currentItemDragged;
+	public static bool oneItemIsDragged;
 
 	[Header ("Platform Type")]
 	public BehaviorType uiBehaviorType;
@@ -49,7 +50,6 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	{
 		if(isDragged)
 		{
-			Debug.Log ("ERROR LOL <3 NORAGE");
 			Vector2 pos;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(hackingCanvas.transform as RectTransform, Input.mousePosition, mainCamera, out pos);
 			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 1f), lerp);
@@ -122,6 +122,7 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	public void OnPointerDown (PointerEventData eventData)
 	{
 		isDragged = true;
+		oneItemIsDragged = true;
 		currentItemDragged = gameObject;
 		
 		if(!isFixed)
@@ -133,6 +134,7 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	public void OnPointerUp (PointerEventData eventData)
 	{
 		isDragged = false;
+		oneItemIsDragged = false;
 		currentItemDragged = null;
 		
 		//Debug.Log ("Up");

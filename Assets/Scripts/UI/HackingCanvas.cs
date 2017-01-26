@@ -14,13 +14,17 @@ public class HackingCanvas : MonoBehaviour
 	public Button firstSelected;
 
 	[Header ("Buttons")]
-	public GameObject[] invokesScroll = new GameObject[3];
+	public GameObject[] scrollsButtons = new GameObject[0];
 
 	[Header ("Scroll")]
+	public GameObject[] invokesScroll = new GameObject[3];
 	public ScrollManager inventoryScroll;
 
 	public ScrollManager onStartScroll;
 	public ScrollManager onPlayerCollisionScroll;
+
+	[Header ("Pause")]
+	public GameObject pauseGroup;
 
 	[Header ("UI Prefabs")]
 	public GameObject boostPrefab;
@@ -36,15 +40,21 @@ public class HackingCanvas : MonoBehaviour
 
 	[Header ("Test")]
 	public bool testGO = false;
+	public bool pause = false;
 	public GameObject test;
 
 	[Header ("UI Camera")]
+	public bool toggleCanvas = false;
 	public Camera UICamera;
 	public float canvasTweenDuration = 0.2f;
 	public Ease canvasTweenEase;
 
 	private GetBehaviors _getBehaviors;
 	private SetBehaviors _setBehaviors;
+
+	private bool canvasVisible = false;
+	private float canvasInitialX;
+	private float canvasInitialY;
 
 	void Awake ()
 	{
@@ -53,6 +63,11 @@ public class HackingCanvas : MonoBehaviour
 
 		inventoryScroll.OnChildCountChange += InventoryDoubledBehavoirs;
 		inventoryScroll.OnBehaviorsChange += InventoryRequiredBehaviors;
+
+		canvasInitialX = transform.localPosition.x;
+		canvasInitialY = transform.localPosition.y;
+
+		HideCanvas ();
 	}
 
 	void OnEnable ()
@@ -76,6 +91,23 @@ public class HackingCanvas : MonoBehaviour
 
 	}
 
+	void Update ()
+	{
+		if(toggleCanvas)
+		{
+			toggleCanvas = false;
+
+			ToggleCanvasVisibility (test);
+		}
+
+		if(pause)
+		{
+			pause = false;
+
+			ToggleCanvasPause ();
+		}
+	}
+
 	public void ShowInvoke (int whichInvoke)
 	{
 		for (int i = 0; i < invokesScroll.Length; i++)
@@ -84,12 +116,12 @@ public class HackingCanvas : MonoBehaviour
 		invokesScroll [whichInvoke].SetActive (true);
 	}
 
-	public void GetPlatformBehaviors (GameObject plateform)
+	void GetPlatformBehaviors (GameObject plateform)
 	{
 		_getBehaviors.GetPlatformBehaviors (plateform);
 	}
 
-	public void SetPlatformsBehaviors (GameObject platform)
+	void SetPlatformsBehaviors (GameObject platform)
 	{
 		currentPlatform = platform;
 
@@ -137,16 +169,131 @@ public class HackingCanvas : MonoBehaviour
 	}
 
 
-	/*public void ShowCanvas ()
+	public void ToggleCanvasVisibility (GameObject plateform)
 	{
-		DOTween.To (()=> UICamera.rect.height, x => UICamera.rect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase);
+		if (!DOTween.IsTweening ("CanvasVisibility"))
+			DOTween.Kill ("CanvasVisibility");
 
+		Rect canvasRect = UICamera.rect;
+
+		currentPlatform = null;
+
+		if (plateform != null && plateform.tag == "Platform" && plateform.GetComponent<BehaviorsDesigner> () != null)
+			currentPlatform = plateform;
+
+		//Hide Pause
+		pauseGroup.SetActive (false);
+
+		ToggleScrollVisibility ();
+
+		//Hide
+		if(canvasVisible)
+		{
+			//Get Behaviors
+			if(currentPlatform != null)
+				_setBehaviors.SetPlatformBehaviors ();
+
+			DOTween.To (() => canvasRect.height, x => canvasRect.height = x, 0.01f, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (() => UICamera.rect = canvasRect).OnComplete (() => canvasVisible = false).SetId ("CanvasVisibility");	
+			transform.DOLocalMoveX (20, canvasTweenDuration).SetEase (canvasTweenEase);
+			transform.DOLocalMoveY (-20, 0.1f).SetEase (canvasTweenEase).SetDelay (canvasTweenDuration);
+
+			currentPlatform = null;
+		}
+
+		//Show
+		else
+		{			
+			onStartScroll.ClearElements ();
+			onPlayerCollisionScroll.ClearElements ();
+
+			transform.DOLocalMoveY (canvasInitialY, 0.1f).SetEase (canvasTweenEase);
+			DOTween.To (()=> canvasRect.height, x => canvasRect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (()=> UICamera.rect = canvasRect).OnComplete (()=> canvasVisible = true).SetId ("CanvasVisibility");
+			transform.DOLocalMoveX (canvasInitialX, canvasTweenDuration).SetEase (canvasTweenEase);
+
+			if(currentPlatform != null)
+			{
+				DOVirtual.DelayedCall (canvasTweenDuration, ()=> {
+					
+					if (currentPlatform != null)
+						GetPlatformBehaviors (currentPlatform);
+					else
+						Debug.LogWarning ("No Platform to get behaviors from!");
+					
+				});				
+			}
+		}
 	}
 
-	public void HideCanvas ()
+	public void ToggleCanvasPause ()
 	{
-		DOTween.To (()=> UICamera.rect.height, x => UICamera.rect.height = x, 0, canvasTweenDuration).SetEase (canvasTweenEase);
+		if (!DOTween.IsTweening ("CanvasVisibility"))
+			DOTween.Kill ("CanvasVisibility");
 
+		Rect canvasRect = UICamera.rect;
 
-	}*/
+		currentPlatform = null;
+
+		//Hide Buttons
+		onStartScroll.gameObject.SetActive (false);
+		onPlayerCollisionScroll.gameObject.SetActive (false);
+
+		//Show Pause
+		pauseGroup.SetActive (true);
+
+		for (int i = 0; i < scrollsButtons.Length; i++)
+			scrollsButtons [i].SetActive (false);
+
+		//Hide
+		if(canvasVisible)
+		{
+			DOTween.To (() => canvasRect.height, x => canvasRect.height = x, 0.01f, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (() => UICamera.rect = canvasRect).OnComplete (() => canvasVisible = false).SetId ("CanvasVisibility");	
+			transform.DOLocalMoveX (20, canvasTweenDuration).SetEase (canvasTweenEase);
+			transform.DOLocalMoveY (-20, 0.1f).SetEase (canvasTweenEase).SetDelay (canvasTweenDuration);
+
+		}
+
+		//Show
+		else
+		{			
+			transform.DOLocalMoveY (canvasInitialY, 0.1f).SetEase (canvasTweenEase);
+			DOTween.To (()=> canvasRect.height, x => canvasRect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (()=> UICamera.rect = canvasRect).OnComplete (()=> canvasVisible = true).SetId ("CanvasVisibility");
+			transform.DOLocalMoveX (canvasInitialX, canvasTweenDuration).SetEase (canvasTweenEase);
+		}
+	}
+
+	void ToggleScrollVisibility ()
+	{
+		//Hide
+		if(currentPlatform == null)
+		{
+			onStartScroll.gameObject.SetActive (false);
+			onPlayerCollisionScroll.gameObject.SetActive (false);
+
+			for (int i = 0; i < scrollsButtons.Length; i++)
+				scrollsButtons [i].SetActive (false);
+		}
+		//Show
+		else
+		{
+			onStartScroll.gameObject.SetActive (true);
+			firstSelected.Select ();
+
+			for (int i = 0; i < scrollsButtons.Length; i++)
+				scrollsButtons [i].SetActive (true);
+		}
+	}
+
+	void HideCanvas ()
+	{
+		Rect canvasRect = UICamera.rect;	
+
+		canvasRect.height = 0.01f;
+		UICamera.rect = canvasRect;
+		transform.localPosition = new Vector3 (20, -20, transform.localPosition.z);
+	}
+
+	public void QuitGame ()
+	{
+		Application.Quit ();
+	}
 }
