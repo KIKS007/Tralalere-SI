@@ -10,13 +10,13 @@ public class BehaviorsDesigner : MonoBehaviour
 	[Header ("OnPlayerCollision")]
 	public List<BehaviorsLoopsEditor> OnPlayerBehaviors = new List<BehaviorsLoopsEditor> ();
 
-	[Header ("OnObjectCollision")]
+	[Header ("OnObjectCollision"), HideInInspector]
 	public List<BehaviorsLoopsEditor> OnObjectBehaviors = new List<BehaviorsLoopsEditor> ();
 
-	[Header ("OnTrigger")]
+	[Header ("OnTrigger"), HideInInspector]
 	public List<BehaviorsLoopsEditor> OnTriggerBehaviors = new List<BehaviorsLoopsEditor> ();
 
-	void Start ()
+	void Awake ()
 	{
 		CleanAllLoops ();
 		SetupBehaviors ();
@@ -180,10 +180,17 @@ public class BehaviorsDesigner : MonoBehaviour
 
 	void CleanBehaviorsLoop (List<BehaviorsLoopsEditor> behaviorsLoopsEditor)
 	{
+		int size = 0;
+
 		for(int i = 0; i < behaviorsLoopsEditor.Count; i++)
 		{
-			if (behaviorsLoopsEditor [i].Behaviors.Count == 0)
-				behaviorsLoopsEditor.Clear ();
+			if (behaviorsLoopsEditor [i].Behaviors.Count != 0)
+				size++;
+		}
+
+		while (behaviorsLoopsEditor.Count > size)
+		{
+			behaviorsLoopsEditor.RemoveAt (behaviorsLoopsEditor.Count - 1);			
 		}
 	}
 }

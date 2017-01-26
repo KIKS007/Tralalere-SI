@@ -13,6 +13,14 @@ public class Colorize : Behavior
 		set { _name = value; }
 	}
 
+	[Header ("Type"), SerializeField]
+	public BehaviorType _behaviorType = BehaviorType.Colorize;
+	public override BehaviorType BehaviorType
+	{
+		get { return _behaviorType; }
+		set { _behaviorType = value; }
+	}
+
 	[Header ("Settings")]
 	public GameObject _gameObject;
 	public Color _color;

@@ -22,15 +22,19 @@ public class ScrollManager : MonoBehaviour
 
 	private float comparaisonOffset = 0f;
 
+	public event EventHandler OnChildCountChange;
+	public event EventHandler OnBehaviorsChange;
+
 	// Use this for initialization
 	void Awake () 
 	{
-		
+
 	}
 
 	void OnEnable ()
 	{
 		content = transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ();
+		StartCoroutine (OnChildrenChange (content.childCount));
 		GetElements ();		
 	}
 
@@ -90,8 +94,7 @@ public class ScrollManager : MonoBehaviour
 			//Debug.Log ("Add");
 			elements.Add (element);
 		}
-
-
+			
 		PlaceElements ();
 	}
 
@@ -113,6 +116,40 @@ public class ScrollManager : MonoBehaviour
 			elements.Remove (element);
 	}
 
+	public void RemoveDoubleElementType (BehaviorType type)
+	{
+		int count = 0;
+		int index = 0;
+
+		for (int i = 0; i < elements.Count; i++)
+		{
+			if (elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == type)
+			{
+				count++;
+
+				if(count == 2)
+				{
+					Vector2 pos = new Vector2 (-500, elements [index].anchoredPosition.y);
+					elements [index].DOAnchorPos (pos, 0.1f);
+
+					StartCoroutine (DelayDestroyElement (index, 0.1f));
+				}
+				else
+					index = i;
+			}			
+		}
+	}
+
+	IEnumerator DelayDestroyElement (int i, float delay)
+	{
+		yield return new WaitForSeconds (delay);
+
+		Destroy (elements [i].gameObject);
+		elements.RemoveAt (i);
+
+		PlaceElements ();
+	}
+
 	public void PlaceElements ()
 	{
 		SetContentHeight ();
@@ -121,8 +158,10 @@ public class ScrollManager : MonoBehaviour
 		{
 			Vector2 pos = new Vector2 (_xPos, -elements [i].sizeDelta.y * 0.5f - gapBetweenElements);
 
-			if (!elements [i].gameObject.GetComponent<DragAndDrop> ().canBeDragged || !elements [i].gameObject.GetComponent<DragAndDrop> ().isDragged)
+			if (!elements [i].gameObject.GetComponent<DragAndDrop> ().isDragged)
 			{
+				//Debug.Log (elements [i]);
+
 				if(i == 0)
 				{
 					elements [i].DOAnchorPos (pos, _duration).SetEase (_ease);
@@ -136,6 +175,9 @@ public class ScrollManager : MonoBehaviour
 				}				
 			}
 		}
+
+		if (OnBehaviorsChange != null)
+			OnBehaviorsChange ();
 	}
 
 	void SetContentHeight ()
@@ -156,5 +198,18 @@ public class ScrollManager : MonoBehaviour
 			Destroy (elements [i].gameObject);
 
 		elements.Clear ();
+	}
+
+	IEnumerator OnChildrenChange (int childCount)
+	{
+		if(gameObject.activeSelf == true)
+		{
+			if (OnChildCountChange != null)
+				OnChildCountChange ();
+			
+			yield return new WaitUntil (() => content.childCount != childCount);
+			
+			StartCoroutine (OnChildrenChange (content.childCount));			
+		}
 	}
 }

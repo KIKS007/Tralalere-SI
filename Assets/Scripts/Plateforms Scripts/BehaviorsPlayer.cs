@@ -7,8 +7,13 @@ using System;
 
 public class BehaviorsPlayer : MonoBehaviour 
 {
+	public static List<BehaviorsPlayer> allPlatforms = new List<BehaviorsPlayer> ();
+
 	[Header ("Behaviors Loops")]
 	public List<BehaviorsLoops> BehaviorLoops = new List<BehaviorsLoops> ();
+
+	[Header ("Current Behavior")]
+	public Behavior currentPlayingBehavior;
 
 	[Header ("Debug")]
 	public bool debugMode = false;
@@ -19,7 +24,10 @@ public class BehaviorsPlayer : MonoBehaviour
 
 	protected virtual void Awake ()
 	{
-		initialPosition = transform.position;
+		if (!allPlatforms.Contains (this))
+			allPlatforms.Add (this);
+		
+		initialPosition = transform.parent.position;
 		_rigidbody = GetComponent<Rigidbody> ();
 	}
 
@@ -32,7 +40,11 @@ public class BehaviorsPlayer : MonoBehaviour
 	public virtual void ResetBehaviors ()
 	{
 		KillBehaviors ();
-		transform.position = initialPosition;
+
+		if(initialPosition == Vector3.zero)
+			initialPosition = transform.parent.position;
+
+		transform.parent.position = initialPosition;
 		GetComponent<Rigidbody> ().velocity = Vector3.zero;
 
 		gameObject.layer = LayerMask.NameToLayer ("Default");
@@ -86,6 +98,8 @@ public class BehaviorsPlayer : MonoBehaviour
 					//Each Beahvior
 					for(int j = 0; j < behaviorLoop.Behaviors.Count; j++)
 					{
+						currentPlayingBehavior = behaviorLoop.Behaviors [j];
+
 						if(debugMode)
 						{
 							Debug.Log ("+++++++++++++++");
@@ -158,6 +172,8 @@ public class BehaviorsPlayer : MonoBehaviour
 				}
 			}
 		}
+
+		currentPlayingBehavior = null;
 	}
 
 	void OnTriggerEnter (Collider other)
@@ -172,5 +188,11 @@ public class BehaviorsPlayer : MonoBehaviour
 	public void KillBehaviors ()
 	{
 		DOTween.Kill ("Behavior" + gameObject.GetInstanceID ());
+	}
+
+	public void OnDestroy ()
+	{
+		if (allPlatforms.Contains (this))
+			allPlatforms.Remove (this);
 	}
 }

@@ -16,9 +16,87 @@ public class BehaviorValues : MonoBehaviour
 
 	private BehaviorType uiBehaviorType;
 
+	[HideInInspector]
+	public InputField _durationInput;
+
+	[HideInInspector]
+	public InputField _xInput;
+	[HideInInspector]
+	public InputField _yInput;
+	[HideInInspector]
+	public InputField _zInput;
+
+	[HideInInspector]
+	public InputField _boostSpeedInput;
+
+	[HideInInspector]
+	public Toggle _enableInput;
+
+	[HideInInspector]
+	public Image _colorInput;
+
+	[HideInInspector]
+	public InputField _loopsCountInput;
+
 	void Awake ()
 	{
+		GetInputs ();
+
+		UpdateValues ();
+	}
+
+	public void GetInputs ()
+	{
 		uiBehaviorType = GetComponent<DragAndDrop> ().uiBehaviorType;
+
+		switch(uiBehaviorType)
+		{
+		case BehaviorType.Boost:
+			_boostSpeedInput = transform.GetChild (1).GetComponent<InputField> ();
+			_enableInput = transform.GetChild (3).GetComponent<Toggle> ();
+			break;
+		case BehaviorType.Bounce:
+
+			_enableInput = transform.GetChild (1).GetComponent<Toggle> ();
+			break;
+		case BehaviorType.Colorize:
+
+			_durationInput = transform.GetChild (3).GetComponent<InputField> ();
+			_colorInput = transform.GetChild (7).GetComponent<Image> ();
+			break;
+		case BehaviorType.Delay:
+
+			_durationInput = transform.GetChild (1).GetComponent<InputField> ();
+			break;
+		case BehaviorType.LoopBegin:
+
+			_loopsCountInput = transform.GetChild (2).GetComponent<InputField> ();
+			break;
+		case BehaviorType.Move:
+
+			_durationInput = transform.GetChild (3).GetComponent<InputField> ();
+
+			_xInput = transform.GetChild (4).GetComponent<InputField> ();
+			_yInput = transform.GetChild (5).GetComponent<InputField> ();
+			_zInput = transform.GetChild (6).GetComponent<InputField> ();
+			break;
+		case BehaviorType.Rotate:
+
+			_durationInput = transform.GetChild (3).GetComponent<InputField> ();
+
+			_xInput = transform.GetChild (4).GetComponent<InputField> ();
+			_yInput = transform.GetChild (5).GetComponent<InputField> ();
+			_zInput = transform.GetChild (6).GetComponent<InputField> ();
+			break;
+		case BehaviorType.Scale:
+
+			_durationInput = transform.GetChild (3).GetComponent<InputField> ();
+
+			_xInput = transform.GetChild (4).GetComponent<InputField> ();
+			_yInput = transform.GetChild (5).GetComponent<InputField> ();
+			_zInput = transform.GetChild (6).GetComponent<InputField> ();
+			break;
+		}
 	}
 
 	public void UpdateValues ()
@@ -26,60 +104,82 @@ public class BehaviorValues : MonoBehaviour
 		switch(uiBehaviorType)
 		{
 		case BehaviorType.Boost:
-			
-			_boostSpeed = GetInt (transform.GetChild (1).GetComponent<InputField> ().text);
-			_enable = transform.GetChild (3).GetComponent<Toggle> ().isOn;
+			int runSpeed = 7;
+
+			if(GameObject.FindGameObjectWithTag ("Player") != null)
+				runSpeed = (int)GameObject.FindGameObjectWithTag ("Player").GetComponent<CCC> ().RunSpeed;
+
+			_boostSpeed = GetInt (_boostSpeedInput.text);
+			_enable = _enableInput.isOn;
+
+			if(_boostSpeed < runSpeed)
+			{
+				_boostSpeed = runSpeed;
+				_boostSpeedInput.text = _boostSpeed.ToString ();
+			}
 			break;
 		case BehaviorType.Bounce:
 			
-			_enable = transform.GetChild (1).GetComponent<Toggle> ().isOn;
+			_enable = _enableInput.isOn;
 			break;
 		case BehaviorType.Colorize:
 			
-			_duration = GetFloat (transform.GetChild (3).GetComponent<InputField> ().text);
-			_color = transform.GetChild (7).GetComponent<Image> ().color;
+			_duration = GetFloat (_durationInput.text);
+			_color = _colorInput.color;
 			break;
 		case BehaviorType.Delay:
 			
-			_duration = GetFloat (transform.GetChild (1).GetComponent<InputField> ().text);
+			_duration = GetFloat (_durationInput.text);
 			break;
 		case BehaviorType.LoopBegin:
 			
-			_loopsCount = GetInt (transform.GetChild (2).GetComponent<InputField> ().text);
+			_loopsCount = GetInt (_loopsCountInput.text);
+
+			if(_loopsCount == 0)
+			{
+				_loopsCount = 1;
+				_loopsCountInput.text = _loopsCount.ToString ();
+			}
+			else if(_loopsCount < 0)
+			{
+				_loopsCount = -1;
+				_loopsCountInput.text = _loopsCount.ToString ();
+			}
+
 			break;
 		case BehaviorType.Move:
 			
-			_duration = GetFloat (transform.GetChild (3).GetComponent<InputField> ().text);
+			_duration = GetFloat (_durationInput.text);
 
 			Vector3 position = new Vector3 ();
 
-			position.x = GetFloat (transform.GetChild (4).GetComponent<InputField> ().text);
-			position.y = GetFloat (transform.GetChild (5).GetComponent<InputField> ().text);
-			position.z = GetFloat (transform.GetChild (6).GetComponent<InputField> ().text);
+			position.x = GetFloat (_xInput.text);
+			position.y = GetFloat (_yInput.text);
+			position.z = GetFloat (_zInput.text);
 
 			_position = position;
 			break;
 		case BehaviorType.Rotate:
 			
-			_duration = GetFloat (transform.GetChild (3).GetComponent<InputField> ().text);
+			_duration = GetFloat (_durationInput.text);
 
 			Vector3 rotation = new Vector3 ();
 
-			rotation.x = GetFloat (transform.GetChild (4).GetComponent<InputField> ().text);
-			rotation.y = GetFloat (transform.GetChild (5).GetComponent<InputField> ().text);
-			rotation.z = GetFloat (transform.GetChild (6).GetComponent<InputField> ().text);
+			rotation.x = GetFloat (_xInput.text);
+			rotation.y = GetFloat (_yInput.text);
+			rotation.z = GetFloat (_zInput.text);
 
 			_rotation = rotation;
 			break;
 		case BehaviorType.Scale:
 			
-			_duration = GetFloat (transform.GetChild (3).GetComponent<InputField> ().text);
+			_duration = GetFloat (_durationInput.text);
 
 			Vector3 scale = new Vector3 ();
 
-			scale.x = GetFloat (transform.GetChild (4).GetComponent<InputField> ().text);
-			scale.y = GetFloat (transform.GetChild (5).GetComponent<InputField> ().text);
-			scale.z = GetFloat (transform.GetChild (6).GetComponent<InputField> ().text);
+			scale.x = GetFloat (_xInput.text);
+			scale.y = GetFloat (_yInput.text);
+			scale.z = GetFloat (_zInput.text);
 
 			_scale = scale;
 			break;
@@ -89,7 +189,7 @@ public class BehaviorValues : MonoBehaviour
 
 	int GetInt (string text)
 	{
-		if (text == "")
+		if (text == "" || text == "-")
 			return 0;
 		else
 			return int.Parse (text);
@@ -97,7 +197,7 @@ public class BehaviorValues : MonoBehaviour
 
 	float GetFloat (string text)
 	{
-		if (text == "" || text == ".")
+		if (text == "" || text == "." || text == "-")
 			return 0;
 		else
 			return float.Parse (text);

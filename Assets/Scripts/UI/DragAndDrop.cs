@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
+public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler, IDragHandler
 {
 	public static GameObject currentItemDragged;
 
@@ -11,8 +11,8 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	public BehaviorType uiBehaviorType;
 
 	[Header ("Drag")]
-	public bool canBeDragged = true;
 	public bool isDragged = false;
+	public bool isFixed = false;
 
 	[Header ("Current Scroll Parent")]
 	public ScrollManager scrollManager;
@@ -23,6 +23,7 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 	private float lerp = 0.2f;
 
 	private RectTransform hackingCanvas;
+	public RectTransform scrollViewport;
 
 	private float myWidth;
 	private float myHeight;
@@ -34,84 +35,109 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 		mainCamera = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
 
 		hackingCanvas = GameObject.FindGameObjectWithTag ("HackingCanvas").GetComponent<RectTransform> ();
-
+			
 		myWidth = (rect.rect.width + 5) / 2;
 		myHeight = (rect.rect.height + 5) / 2;
 
 		if (transform.parent.parent.parent.GetComponent<ScrollManager> () != null)
 			scrollManager = transform.parent.parent.parent.GetComponent<ScrollManager> ();
+		
+		scrollViewport = scrollManager.content.parent.GetComponent<RectTransform> ();
 	}
 
 	void Update ()
 	{
 		if(isDragged)
 		{
+			Debug.Log ("ERROR LOL <3 NORAGE");
 			Vector2 pos;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(hackingCanvas.transform as RectTransform, Input.mousePosition, mainCamera, out pos);
-			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 0.6f), lerp);
+			transform.position = Vector3.Lerp (transform.position, hackingCanvas.transform.TransformPoint(pos * 1f), lerp);
 
-			BlockRect ();
+			if(!isFixed)
+				BlockRect (hackingCanvas);
+			else
+				FixedBlockRect (scrollViewport);
 		}
 	}
 
-
-
-	public void Test (BehaviorType test)
+	void BlockRect (RectTransform parent)
 	{
-		
+		if(rect.anchoredPosition.x < -((parent.rect.width / 2) - myWidth))
+		{
+			Vector3 localPos = rect.anchoredPosition;
+			localPos.x = -((parent.rect.width / 2) - myWidth);
+			rect.anchoredPosition = localPos;
+		}
+		else if(rect.anchoredPosition.x > ((parent.rect.width / 2) - myWidth))
+		{
+			Vector3 localPos = rect.anchoredPosition;
+			localPos.x = ((parent.rect.width / 2) - myWidth);
+			rect.anchoredPosition = localPos;
+		}
+
+		if(rect.anchoredPosition.y < -((parent.rect.height / 2) - myHeight) - 250)
+		{
+			Vector3 localPos = rect.anchoredPosition;
+			localPos.y = -((parent.rect.height / 2) - myHeight) - 250;
+			rect.anchoredPosition = localPos;
+		}
+		else if(rect.anchoredPosition.y > ((parent.rect.height / 2) - myHeight) - 250)
+		{
+			Vector3 localPos = rect.anchoredPosition;
+			localPos.y = ((parent.rect.height / 2) - myHeight) - 250;
+			rect.anchoredPosition = localPos;
+		}
 	}
 
-	void BlockRect ()
+	void FixedBlockRect (RectTransform parent)
 	{
-		if(rect.anchoredPosition.x < -((hackingCanvas.rect.width / 2) - myWidth))
+		if(rect.anchoredPosition.x < -((parent.rect.width / 2) - myWidth))
 		{
 			Vector3 localPos = rect.anchoredPosition;
-			localPos.x = -((hackingCanvas.rect.width / 2) - myWidth);
+			localPos.x = -((parent.rect.width / 2) - myWidth);
 			rect.anchoredPosition = localPos;
 		}
-		else if(rect.anchoredPosition.x > ((hackingCanvas.rect.width / 2) - myWidth))
+		else if(rect.anchoredPosition.x > ((parent.rect.width / 2) - myWidth))
 		{
 			Vector3 localPos = rect.anchoredPosition;
-			localPos.x = ((hackingCanvas.rect.width / 2) - myWidth);
+			localPos.x = ((parent.rect.width / 2) - myWidth);
 			rect.anchoredPosition = localPos;
 		}
 
-		if(rect.anchoredPosition.y < -((hackingCanvas.rect.height / 2) - myHeight) - 250)
+		if(rect.anchoredPosition.y < -((parent.rect.height / 2) - myHeight) - 250)
 		{
 			Vector3 localPos = rect.anchoredPosition;
-			localPos.y = -((hackingCanvas.rect.height / 2) - myHeight) - 250;
+			localPos.y = -((parent.rect.height / 2) - myHeight) - 250;
 			rect.anchoredPosition = localPos;
 		}
-		else if(rect.anchoredPosition.y > ((hackingCanvas.rect.height / 2) - myHeight) - 250)
+		else if(rect.anchoredPosition.y > ((parent.rect.height / 2) - myHeight) - 170)
 		{
 			Vector3 localPos = rect.anchoredPosition;
-			localPos.y = ((hackingCanvas.rect.height / 2) - myHeight) - 250;
+			localPos.y = ((parent.rect.height / 2) - myHeight) - 170;
 			rect.anchoredPosition = localPos;
 		}
 	}
 
 	public void OnPointerDown (PointerEventData eventData)
 	{
-		if(canBeDragged)
-		{
-			isDragged = true;
-			currentItemDragged = gameObject;
-			
+		isDragged = true;
+		currentItemDragged = gameObject;
+		
+		if(!isFixed)
 			RemoveFromScroll ();
-			
-			StartCoroutine (MoveOtherElements ());			
-		}
+		
+		StartCoroutine (MoveOtherElements ());			
 	}
 
 	public void OnPointerUp (PointerEventData eventData)
 	{
-		if(canBeDragged)
-		{
-			isDragged = false;
-			currentItemDragged = null;
-			
-			CheckDrop ();			
-		}
+		isDragged = false;
+		currentItemDragged = null;
+		
+		//Debug.Log ("Up");
+		
+		CheckDrop ();			
 	}
 
 	public void CheckDrop ()
@@ -120,12 +146,13 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 		if(scrollTemp != null)
 		{
-			//Debug.Log (scrollManager);
-			if (scrollManager != null && scrollManager != scrollTemp)
+			if (scrollManager != null && scrollManager != scrollTemp && !isFixed)
 				RemoveFromScroll ();
 
-			scrollManager = scrollTemp;
-			scrollManager.InsertElement (rect);
+			if (scrollManager == scrollTemp && isFixed || !isFixed)
+				scrollManager = scrollTemp;			
+
+			scrollManager.InsertElement (rect);				
 		}
 		else
 		{
@@ -178,13 +205,16 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 
 			if(scrollTemp != null)
 			{
-				if (scrollManager != null && scrollManager != scrollTemp)
+				if (scrollManager != null && scrollManager != scrollTemp && !isFixed)
 				{
 					RemoveFromScroll ();
 				}
 
-				scrollManager = scrollTemp;
-				scrollManager.InsertElement (rect, false);
+				if (scrollManager == scrollTemp && isFixed || !isFixed)
+				{
+					scrollManager = scrollTemp;
+					scrollManager.InsertElement (rect, false);					
+				}				
 			}
 			
 			//Debug.Log (scrollTemp);
@@ -193,5 +223,10 @@ public class DragAndDrop : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 			StartCoroutine (MoveOtherElements ());
 		}
 
+	}
+
+	public void OnDrag (PointerEventData eventData)
+	{
+		//Do nothing
 	}
 }

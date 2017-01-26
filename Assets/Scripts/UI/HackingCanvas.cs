@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class HackingCanvas : MonoBehaviour 
 {
+	[Header ("Current Platform")]
+	public GameObject currentPlatform;
+
 	[Header ("First Selected")]
 	public Button firstSelected;
 
@@ -30,16 +34,25 @@ public class HackingCanvas : MonoBehaviour
 	public GameObject scalePrefab;
 	public GameObject waitPrefab;
 
-	private GameObject player;
-
+	[Header ("Test")]
+	public bool testGO = false;
 	public GameObject test;
 
-	private Inventory playerInventory;
+	[Header ("UI Camera")]
+	public Camera UICamera;
+	public float canvasTweenDuration = 0.2f;
+	public Ease canvasTweenEase;
+
+	private GetBehaviors _getBehaviors;
+	private SetBehaviors _setBehaviors;
 
 	void Awake ()
 	{
-		player = GameObject.FindGameObjectWithTag ("Player");
-		playerInventory = player.GetComponent<Inventory> ();
+		_getBehaviors = GetComponent<GetBehaviors> ();
+		_setBehaviors = GetComponent<SetBehaviors> ();
+
+		inventoryScroll.OnChildCountChange += InventoryDoubledBehavoirs;
+		inventoryScroll.OnBehaviorsChange += InventoryRequiredBehaviors;
 	}
 
 	void OnEnable ()
@@ -47,9 +60,20 @@ public class HackingCanvas : MonoBehaviour
 		firstSelected.Select ();
 		ShowInvoke (0);
 
-		//GetPlateformBehaviors (test);
+		InventoryRequiredBehaviors ();
 
-		GetInventoryElements ();
+		if(currentPlatform == null)
+		{
+			onStartScroll.ClearElements ();
+			onPlayerCollisionScroll.ClearElements ();
+		}
+	}
+
+	void Start ()
+	{
+		if(testGO)
+			GetPlatformBehaviors (test);		
+
 	}
 
 	public void ShowInvoke (int whichInvoke)
@@ -60,53 +84,46 @@ public class HackingCanvas : MonoBehaviour
 		invokesScroll [whichInvoke].SetActive (true);
 	}
 
-	void GetPlateformBehaviors (GameObject plateform)
+	public void GetPlatformBehaviors (GameObject plateform)
 	{
-		OnStart onStart = plateform.GetComponent<OnStart> ();
-		OnPlayerCollision onPlayerCollision = plateform.GetComponent<OnPlayerCollision> ();
+		_getBehaviors.GetPlatformBehaviors (plateform);
+	}
 
-		bool beginLoopPlaced = false;
-		bool endLoopPlaced = false;
+	public void SetPlatformsBehaviors (GameObject platform)
+	{
+		currentPlatform = platform;
 
-		//Clear Scrolls
-		onStartScroll.ClearElements ();
-		onPlayerCollisionScroll.ClearElements ();
+		_setBehaviors.SetPlatformBehaviors ();
+	}
 
-		if(onStart.BehaviorLoops.Count > 0)
+	void InventoryDoubledBehavoirs ()
+	{
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Wait);
+		inventoryScroll.RemoveDoubleElementType (BehaviorType.Delay);
+	}
+
+	void InventoryRequiredBehaviors ()
+	{
+		bool delay = false;
+		bool wait = false;
+
+		for(int i = 0; i < inventoryScroll.elements.Count; i++)
 		{
-			if(onStart.BehaviorLoops [0].LoopsCount == 1)
-			{
-				
-			}
+			if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Delay)
+				delay = true;
 
-			else if(onStart.BehaviorLoops [0].LoopsCount < 0 || onStart.BehaviorLoops [0].LoopsCount > 1)
-			{
-				
-			}
+			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Wait)
+				wait = true;
 		}
+
+		if (!wait)
+			AddBehavior (waitPrefab, inventoryScroll);
+
+		if (!delay)
+			AddBehavior (delayPrefab, inventoryScroll);
 	}
 
-	void AddBoost (Boost boost, ScrollManager scroll)
-	{
-		GameObject clone = AddBehavior (boostPrefab, scroll);
-
-		//clone.
-	}
-
-	public void GetInventoryElements ()
-	{
-		inventoryScroll.ClearElements ();
-
-		AddBehavior (loopBeginPrefab, inventoryScroll);
-		AddBehavior (loopEndPrefab, inventoryScroll);
-
-		for (int i = 0; i < playerInventory.elements.Count; i++)
-		{
-			
-		}
-	}
-
-	GameObject AddBehavior (GameObject prefab, ScrollManager scroll)
+	public GameObject AddBehavior (GameObject prefab, ScrollManager scroll)
 	{
 		GameObject clone = Instantiate (prefab, Vector3.zero, Quaternion.identity, scroll.transform.GetChild (0).GetChild (0).GetComponent<RectTransform> ());
 
@@ -118,4 +135,18 @@ public class HackingCanvas : MonoBehaviour
 
 		return clone;
 	}
+
+
+	/*public void ShowCanvas ()
+	{
+		DOTween.To (()=> UICamera.rect.height, x => UICamera.rect.height = x, 1, canvasTweenDuration).SetEase (canvasTweenEase);
+
+	}
+
+	public void HideCanvas ()
+	{
+		DOTween.To (()=> UICamera.rect.height, x => UICamera.rect.height = x, 0, canvasTweenDuration).SetEase (canvasTweenEase);
+
+
+	}*/
 }
