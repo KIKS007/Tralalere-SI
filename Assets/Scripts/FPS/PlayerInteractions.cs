@@ -58,6 +58,8 @@ public class PlayerInteractions : MonoBehaviour {
 							_holdObjectRotation = _holdObject.transform.localRotation;
 							_holdObjectLayer = _holdObject.gameObject.layer;
 							_holdObject.gameObject.layer = 9;
+
+							Cursor.lockState = CursorLockMode.None;
 						}
 					}
 				}
@@ -69,6 +71,9 @@ public class PlayerInteractions : MonoBehaviour {
 						_holdObject.gameObject.layer = _holdObjectLayer;
 						_holdObject.transform.parent = null;
 						_holdObject = null;
+
+						Cursor.lockState = CursorLockMode.None;
+						Cursor.lockState = CursorLockMode.Locked;
 					}
 				}
 			}

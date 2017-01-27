@@ -117,7 +117,7 @@ public class BehaviorsDesigner : MonoBehaviour
 				case BehaviorType.Rotate:
 					
 					behaviorLoopsTarget [i].Behaviors.Add (ScriptableObject.CreateInstance ("Rotate") as Behavior);
-					var rotateBehavior = (Rotate)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
+					var rotateBehavior = (RotateReporter)behaviorLoopsTarget [i].Behaviors [behaviorLoopsTarget [i].Behaviors.Count - 1];
 
 					rotateBehavior._wait = behaviorsLoopsEditor [i].Behaviors [j].Wait;
 
