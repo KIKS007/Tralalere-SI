@@ -41,7 +41,7 @@ public class BehaviorsPlayer : MonoBehaviour
 		initialLocalRotation = transform.localRotation;
 		initialRotation = transform.parent.localRotation;
 		initialScale = transform.localScale;
-		initialColor = transform.GetChild (0).GetComponent<Renderer> ().material.color;
+		//initialColor = transform.GetChild (0).GetComponent<Renderer> ().material.color;
 	}
 
 	protected virtual void FixedUpdate ()
@@ -61,14 +61,14 @@ public class BehaviorsPlayer : MonoBehaviour
 			initialRotation = transform.parent.localRotation;
 
 			initialScale = transform.localScale;
-			initialColor = transform.GetChild (0).GetComponent<Renderer> ().material.color;
+			//initialColor = transform.GetChild (0).GetComponent<Renderer> ().material.color;
 		}
 
 		transform.parent.position = initialPosition;
 		transform.parent.rotation = initialRotation;
 		transform.localRotation = initialLocalRotation;
 		transform.localScale = initialScale;
-		transform.GetChild (0).GetComponent<Renderer> ().material.color = initialColor;
+		//transform.GetChild (0).GetComponent<Renderer> ().material.color = initialColor;
 
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.Euler (Vector3.zero);

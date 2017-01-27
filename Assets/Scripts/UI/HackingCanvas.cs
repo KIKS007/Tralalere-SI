@@ -97,8 +97,8 @@ public class HackingCanvas : MonoBehaviour
 
 	void OnEnable ()
 	{
-		firstSelected.Select ();
-		ShowInvoke (0);
+		//firstSelected.Select ();
+		//ShowInvoke (0);
 
 		InventoryRequiredBehaviors ();
 
@@ -194,7 +194,7 @@ public class HackingCanvas : MonoBehaviour
 
 		bool bounce = false;
 		bool boost = false;
-		bool colorize = false;
+		//bool colorize = false;
 		bool move = false;
 		bool rotate = false;
 		bool scale = false;
@@ -213,8 +213,8 @@ public class HackingCanvas : MonoBehaviour
 			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Bounce)
 				bounce = true;
 
-			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Colorize)
-				colorize = true;
+			/*else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Colorize)
+				colorize = true;*/
 
 			else if (inventoryScroll.elements [i].GetComponent<DragAndDrop> ().uiBehaviorType == BehaviorType.Move)
 				move = true;
@@ -238,8 +238,8 @@ public class HackingCanvas : MonoBehaviour
 		if (!bounce)
 			AddBehavior (bouncePrefab, inventoryScroll, true);
 
-		if (!colorize)
-			AddBehavior (colorizePrefab, inventoryScroll, true);
+		/*if (!colorize)
+			AddBehavior (colorizePrefab, inventoryScroll, true);*/
 
 		if (!move)
 			AddBehavior (movePrefab, inventoryScroll, true);
@@ -355,6 +355,7 @@ public class HackingCanvas : MonoBehaviour
 		currentPlatform = null;
 
 		//Hide Buttons
+		inventoryScroll.gameObject.SetActive (false);
 		onStartScroll.gameObject.SetActive (false);
 		onPlayerCollisionScroll.gameObject.SetActive (false);
 
@@ -447,6 +448,7 @@ public class HackingCanvas : MonoBehaviour
 		{
 			onStartScroll.gameObject.SetActive (false);
 			onPlayerCollisionScroll.gameObject.SetActive (false);
+			inventoryScroll.gameObject.SetActive (false);
 
 			for (int i = 0; i < scrollsButtons.Length; i++)
 				scrollsButtons [i].SetActive (false);
@@ -455,6 +457,7 @@ public class HackingCanvas : MonoBehaviour
 		else
 		{
 			onStartScroll.gameObject.SetActive (true);
+			inventoryScroll.gameObject.SetActive (true);
 			onPlayerCollisionScroll.gameObject.SetActive (false);
 			firstSelected.Select ();
 

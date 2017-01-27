@@ -49,8 +49,8 @@ public class CCC : MonoBehaviour
 		_body = GetComponent<Rigidbody>();
 		_sound = GetComponent <SoundManager> ();
 
-		Cursor.lockState = CursorLockMode.None;
-		Cursor.lockState = CursorLockMode.Locked;
+		//Cursor.lockState = CursorLockMode.None;
+		//Cursor.lockState = CursorLockMode.Locked;
 		_yRotation = _body.rotation.eulerAngles.y;
 	}
 

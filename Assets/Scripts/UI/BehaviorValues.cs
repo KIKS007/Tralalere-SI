@@ -123,10 +123,22 @@ public class BehaviorValues : MonoBehaviour
 			
 			_duration = GetFloat (_durationInput.text);
 			_color = _colorInput.color;
+
+			if(_duration == 0)
+			{
+				_duration = 1;
+				_durationInput.text = _duration.ToString ();
+			}
 			break;
 		case BehaviorType.Delay:
 			
 			_duration = GetFloat (_durationInput.text);
+
+			if(_duration == 0)
+			{
+				_duration = 1;
+				_durationInput.text = _duration.ToString ();
+			}
 			break;
 		case BehaviorType.LoopBegin:
 			
@@ -155,6 +167,12 @@ public class BehaviorValues : MonoBehaviour
 			position.z = GetFloat (_zInput.text);
 
 			_position = position;
+
+			if(_duration == 0)
+			{
+				_duration = 1;
+				_durationInput.text = _duration.ToString ();
+			}
 			break;
 		case BehaviorType.Rotate:
 			
@@ -167,6 +185,12 @@ public class BehaviorValues : MonoBehaviour
 			rotation.z = GetFloat (_zInput.text);
 
 			_rotation = rotation;
+
+			if(_duration == 0)
+			{
+				_duration = 1;
+				_durationInput.text = _duration.ToString ();
+			}
 			break;
 		case BehaviorType.Scale:
 			
@@ -179,6 +203,12 @@ public class BehaviorValues : MonoBehaviour
 			scale.z = GetFloat (_zInput.text);
 
 			_scale = scale;
+
+			if(_duration == 0)
+			{
+				_duration = 1;
+				_durationInput.text = _duration.ToString ();
+			}
 			break;
 		}
 
