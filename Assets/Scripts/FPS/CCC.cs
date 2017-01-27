@@ -127,58 +127,58 @@ public class CCC : MonoBehaviour
 	void FixedUpdate()
 	{
 		if (!Pause) {
-				//ROTATION-----------------------------
-				var rot = _body.rotation.eulerAngles;
-				//if the rotation of the rigibody and the desired rotation are approximately the same
+			//ROTATION-----------------------------
+			var rot = _body.rotation.eulerAngles;
+			//if the rotation of the rigibody and the desired rotation are approximately the same
 				//we don't need to update the rigidbody
 				//it can happend in 2 cases :
 				//	-	the player doesn't move the mouse along the X axis
 				//	-	the fixedUpdate has been called twice during the same Update
 				//		so no new input has been process so _yRotation didn't change
-				if (!Mathf.Approximately(rot.y, _yRotation))
-				{
-					rot.y = _yRotation;
-					_body.MoveRotation(Quaternion.Euler(rot));
-				}
-
-				var velocity = _body.velocity;
-				if (_speed != Vector3.zero)
-				{
-					//Deplacement au sol (à modifier)
-					if (_isGrounded) {
-						Vector3 velocityChange = (_speed - velocity);
-						velocityChange.y = 0;
-						_body.AddForce(velocityChange, ForceMode.VelocityChange);
-					}
-					//AirControl
-					else {
-						_speed *= Time.fixedDeltaTime;
-						if (Vector2.Angle (new Vector2 (velocity.x, velocity.z), new Vector2 (_speed.x, _speed.z)) <= 90) {
-							float _proj = ((velocity.x * _speed.x) + (velocity.z * _speed.z)) / ((_speed.x * _speed.x) + (_speed.z + _speed.z));
-							_proj *= new Vector2 (_speed.x, _speed.z).magnitude;
-							if (_proj < AirControl) {
-								_body.velocity += _speed;
-							}
-						}
-						else {
-							_body.velocity += _speed;
-						}
-					}
-
-					_isMoving = true;
-				}
-				//Stop le player quand il est au sol et qu'il ne fait pas d'input
-				else if (_isGrounded && _isMoving)
-				{
-					_body.velocity = Vector3.zero;
-					_isMoving = false;
-				}
-					
-				_jumpCounter--;
+			if (!Mathf.Approximately(rot.y, _yRotation))
+			{
+				rot.y = _yRotation;
+				_body.MoveRotation(Quaternion.Euler(rot));
 			}
 
-			//gravité
-			_body.AddForce(Vector3.down * Gravity, ForceMode.Acceleration);
+			var velocity = _body.velocity;
+			if (_speed != Vector3.zero)
+			{
+				//Deplacement au sol (à modifier)
+				if (_isGrounded) {
+					Vector3 velocityChange = (_speed - velocity);
+					velocityChange.y = 0;
+					_body.AddForce(velocityChange, ForceMode.VelocityChange);
+				}
+				//AirControl
+				else {
+					_speed *= 0.05f;
+					if (Vector2.Angle (new Vector2 (velocity.x, velocity.z), new Vector2 (_speed.x, _speed.z)) <= 90) {
+						float _proj = ((velocity.x * _speed.x) + (velocity.z * _speed.z)) / ((_speed.x * _speed.x) + (_speed.z * _speed.z));
+						_proj *= new Vector2 (_speed.x, _speed.z).magnitude;
+						if (_proj < AirControl) {
+								_body.velocity += _speed;
+						}
+					}
+					else {
+						_body.velocity += _speed;
+					}
+				}
+
+				_isMoving = true;
+			}
+			//Stop le player quand il est au sol et qu'il ne fait pas d'input
+			else if (_isGrounded && _isMoving)
+			{
+				_body.velocity = Vector3.zero;
+				_isMoving = false;
+			}
+					
+			_jumpCounter--;
+		}
+
+		//gravité
+		_body.AddForce(Vector3.down * Gravity, ForceMode.Acceleration);
 
 		if (Pause) {
 			if (_isGrounded) {
