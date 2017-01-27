@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class Rotate : Behavior 
+public class RotateReporter : Behavior 
 {
 	[HideInInspector]
 	public string _name = "Rotate";

@@ -20,19 +20,16 @@ public class BehaviorColor : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
 	private Text text;
 
-	private Material material;
-
 	private string onStartProperty = "_Contour_Color_OnStart";
 	private string onCollisionProperty = "_Contour_Color_PLayer";
 	private string inventoryProperty = "_Contour_Color_Inventory";
-
-	private string colorProperty = "_Color";
 
 	private ScrollType textColorType;
 
 	// Use this for initialization
 	void Awake () 
 	{
+
 		onStartColor = GetComponent<Image> ().material.GetColor (onStartProperty);
 		onCollisionColor = GetComponent<Image> ().material.GetColor (onCollisionProperty);
 		inventoryColor = GetComponent<Image> ().material.GetColor (inventoryProperty);
@@ -40,10 +37,6 @@ public class BehaviorColor : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 		text = transform.GetChild (0).GetComponent<Text> ();
 
 		GetComponent<Image> ().material = new Material (GetComponent<Image> ().material);
-		material =  GetComponent<Image> ().material;
-
-		//Debug.Log (GetComponent<Image> ().material.GetFloat ("_Color"));
-
 	}
 
 	void Start ()
@@ -54,9 +47,7 @@ public class BehaviorColor : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
 	public void OnPointerDown (PointerEventData eventData)
 	{
-		Color textColorTemp = text.color;
-
-		Material materialTemp = GetComponent<Image> ().material = new Material (selected);
+		GetComponent<Image> ().material = new Material (selected);
 
 		switch(textColorType)
 		{
@@ -70,18 +61,6 @@ public class BehaviorColor : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 			GetComponent<Image> ().material.SetColor (inventoryProperty, onStartColor);
 			break;
 		}
-
-		/*if (textColorTemp == onStartColor)
-			GetComponent<Image> ().material.SetColor (inventoryProperty, onStartColor);
-
-		else if(textColorTemp == onCollisionColor)
-			GetComponent<Image> ().material.SetColor (inventoryProperty, onCollisionColor);
-
-		else if(textColorTemp == inventoryColor)
-			GetComponent<Image> ().material.SetColor (inventoryProperty, inventoryColor);*/
-
-		//SetNewColor ();
-		//text.color = new Color (selectedColor.r, selectedColor.b, selectedColor.g, 1);
 	}
 
 	public void OnPointerUp (PointerEventData eventData)
@@ -89,7 +68,6 @@ public class BehaviorColor : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 		GetComponent<Image> ().material = new Material (inViewport);
 
 		SetNewColor ();
-		//text.color = new Color (inViewportColor.r, inViewportColor.b, inViewportColor.g, 1);
 	}
 
 	void SetNewColor ()
