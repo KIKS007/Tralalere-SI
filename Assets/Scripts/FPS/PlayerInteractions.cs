@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
 using DarkTonic.MasterAudio;
+using UnityEngine.UI;
 
 public class PlayerInteractions : MonoBehaviour {
 
@@ -15,6 +16,11 @@ public class PlayerInteractions : MonoBehaviour {
 
 	public HackingCanvas _hackingCanvas;
 
+	[Header ("Cursors")]
+	public Image crossHair;
+	public Sprite cursorIdle;
+	public Sprite cursorAiming;
+
 	Rigidbody _holdObject;
 	Quaternion _holdObjectRotation;
 	int _holdObjectLayer;
@@ -22,17 +28,52 @@ public class PlayerInteractions : MonoBehaviour {
 	Player _player;
 	Transform _objectSnap;
 
-	//public bool
-
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		_camera = transform.GetChild (0).GetChild (0).transform;
 		_player = ReInput.players.GetPlayer(0);
 		_objectSnap = transform.GetChild (0).GetChild (1).transform;
+
+		StartCoroutine (SetCursorDelay ());
+	}
+
+	IEnumerator SetCursorDelay ()
+	{
+		yield return new WaitForEndOfFrame();
+		yield return new WaitForEndOfFrame();
+
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
+		//Cursor.SetCursor (cursorIdle, new Vector2 (cursorIdle.width * 0.5f, cursorIdle.height * 0.5f), CursorMode.Auto);
+
+		RaycastHit hit2;
+
+		if (!Pause && !CrackMode) 
+		{
+			if (Cursor.visible)
+				Cursor.visible = false;
+
+			if(!crossHair.enabled)
+				crossHair.enabled = true;
+
+			if(Physics.Raycast (_camera.position, _camera.forward, out hit2, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore))
+			{
+				if (hit2.collider.attachedRigidbody != null && hit2.collider.attachedRigidbody.GetComponent<BehaviorsDesigner> () != null)
+				{
+					if(crossHair.sprite != cursorAiming)
+						crossHair.sprite = cursorAiming;
+					
+				}
+				else
+				{
+					if(crossHair.sprite != cursorIdle)
+						crossHair.sprite = cursorIdle;
+				}
+			}
+		}
 
 		if (_player.GetButtonDown ("Pause")) {
 			if (!Pause) {
@@ -51,7 +92,8 @@ public class PlayerInteractions : MonoBehaviour {
 			}
 		}
 
-		if (!Pause) {
+		if (!Pause) 
+		{
 
 			if (!CrackMode) {
 				RaycastHit hit;
@@ -85,15 +127,7 @@ public class PlayerInteractions : MonoBehaviour {
 				}
 			}
 
-			RaycastHit hit2;
 
-			/*if (Physics.Raycast (_camera.position, _camera.forward, out hit2, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore)) 
-			{
-				//Debug.Log (hit.collider.gameObject.name);
-
-				if (hit2.collider.attachedRigidbody == null)
-					return;
-			}*/
 
 			if (_player.GetButtonDown ("Fire")) {
 				if (!CrackMode && !_hackingCanvas.canvasVisible) 
@@ -104,7 +138,12 @@ public class PlayerInteractions : MonoBehaviour {
 
 							if (hit2.collider.attachedRigidbody == null)
 								return;
-							
+
+							crossHair.enabled = false;
+
+							if (!Cursor.visible)
+								Cursor.visible = true;
+
 							_hackingCanvas.ToggleCanvasVisibility (hit2.collider.attachedRigidbody.gameObject);
 							CrackMode = true;
 							gameObject.GetComponent <CCC>().Pause = true;
