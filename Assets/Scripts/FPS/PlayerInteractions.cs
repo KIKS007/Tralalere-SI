@@ -28,20 +28,29 @@ public class PlayerInteractions : MonoBehaviour {
 	Player _player;
 	Transform _objectSnap;
 
+	bool firstFrame = false;
+
 	// Use this for initialization
 	void Awake () {
 		_camera = transform.GetChild (0).GetChild (0).transform;
 		_player = ReInput.players.GetPlayer(0);
 		_objectSnap = transform.GetChild (0).GetChild (1).transform;
 
-		StartCoroutine (SetCursorDelay ());
+		/*//Canvas 
+		Pause = true;
+		crossHair.enabled = false;
+
+		if (!Cursor.visible)
+			Cursor.visible = true;
+
+		//gameObject.GetComponent <CCC>().Pause = true;
+		Cursor.lockState = CursorLockMode.None;
+		_hackingCanvas.ToggleCanvasPause();*/
 	}
 
-	IEnumerator SetCursorDelay ()
+	void Start ()
 	{
-		yield return new WaitForEndOfFrame();
-		yield return new WaitForEndOfFrame();
-
+		
 	}
 	
 	// Update is called once per frame
@@ -81,6 +90,12 @@ public class PlayerInteractions : MonoBehaviour {
 					UnHackGame ();
 				}
 				else {
+
+					crossHair.enabled = false;
+
+					if (!Cursor.visible)
+						Cursor.visible = true;
+					
 					Pause = true;
 					gameObject.GetComponent <CCC>().Pause = true;
 					Cursor.lockState = CursorLockMode.None;
