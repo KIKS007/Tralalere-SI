@@ -34,10 +34,15 @@ public class PlayerInteractions : MonoBehaviour {
 
 		if (_player.GetButtonDown ("Pause")) {
 			if (!Pause) {
-				Pause = true;
-				gameObject.GetComponent <CCC>().Pause = true;
-				Cursor.lockState = CursorLockMode.None;
-				_hackingCanvas.ToggleCanvasPause();
+				if (CrackMode) {
+					UnHackGame ();
+				}
+				else {
+					Pause = true;
+					gameObject.GetComponent <CCC>().Pause = true;
+					Cursor.lockState = CursorLockMode.None;
+					_hackingCanvas.ToggleCanvasPause();
+				}
 			}
 			else {
 				UnPauseGame ();
