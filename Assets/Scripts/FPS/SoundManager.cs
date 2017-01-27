@@ -11,14 +11,26 @@ public class SoundManager : MonoBehaviour {
 	public float EnterSoundVolume = 1f;
 	[SoundGroupAttribute] public string JumpSound;
 	public float JumpSoundVolume = 1f;
-	[SoundGroupAttribute] public string StepSound;
-	public float StepSoundVolume = 1f;
+	[SoundGroupAttribute] public string LandingSound;
+	public float LandingSoundVolume = 1f;
+	[SoundGroupAttribute] public string WalkSound;
+	public float WalkSoundVolume = 1f;
+	[SoundGroupAttribute] public string RunSound;
+	public float RunSoundVolume = 1f;
+
+	public HackingCanvas _hackingCanvas;
+
+	void Start () {
+		_hackingCanvas.OnHackBegin += PlayHackSound;
+		_hackingCanvas.OnHackEnd += StopHackSound;
+		_hackingCanvas.OnCloseEditMode += PlayEnterSound;
+	}
 
 	public void PlayHackSound () {
 		MasterAudio.PlaySound3DFollowTransformAndForget (HackingSound, transform, HackingSoundVolume);
 	}
 
-	public void StopHackingSound () {
+	public void StopHackSound () {
 		MasterAudio.StopAllOfSound(HackingSound);
 	}
 
@@ -26,23 +38,27 @@ public class SoundManager : MonoBehaviour {
 		MasterAudio.PlaySound3DFollowTransformAndForget (EnterSound, transform, EnterSoundVolume);
 	}
 
-	public void StopEnterSound () {
-		MasterAudio.StopAllOfSound(EnterSound);
-	}
-
 	public void PlayJumpSound () {
 		MasterAudio.PlaySound3DFollowTransformAndForget (JumpSound, transform, JumpSoundVolume);
 	}
 
-	public void StopJumpSound () {
-		MasterAudio.StopAllOfSound(JumpSound);
+	public void PlayLandingSound () {
+		MasterAudio.PlaySound3DFollowTransformAndForget (LandingSound, transform, LandingSoundVolume);
 	}
 
-	public void PlayStepSound () {
-		MasterAudio.PlaySound3DFollowTransformAndForget (StepSound, transform, StepSoundVolume);
+	public void PlayWalkSound () {
+		MasterAudio.PlaySound3DFollowTransformAndForget (WalkSound, transform, WalkSoundVolume);
 	}
 
-	public void StopStepSound () {
-		MasterAudio.StopAllOfSound(StepSound);
+	public void StopWalkSound () {
+		MasterAudio.StopAllOfSound(WalkSound);
+	}
+
+	public void PlayRunSound () {
+		MasterAudio.PlaySound3DFollowTransformAndForget (RunSound, transform, RunSoundVolume);
+	}
+
+	public void StopRunSound () {
+		MasterAudio.StopAllOfSound(RunSound);
 	}
 }
