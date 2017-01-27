@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
+public enum ScrollType { Inventory, OnStart, OnCollision}
+
 public class ScrollManager : MonoBehaviour 
 {
 	public List<RectTransform> elements = new List<RectTransform> ();
+
+	public ScrollType scrollType;
 
 	private float _xPos = 30f;
 	private float _initialYPos = 70;

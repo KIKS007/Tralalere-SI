@@ -207,7 +207,7 @@ public class GetBehaviors : MonoBehaviour
 		GameObject clone = _hackingCanvas.AddBehavior (_hackingCanvas.rotatePrefab, scroll);
 
 		BehaviorValues behaviorValues = clone.GetComponent<BehaviorValues> ();
-		Rotate behaviorScript = behavior as Rotate;
+		RotateReporter behaviorScript = behavior as RotateReporter;
 
 		behaviorValues.GetInputs ();
 
