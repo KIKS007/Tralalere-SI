@@ -127,7 +127,7 @@ public class SetBehaviors : MonoBehaviour
 			case BehaviorType.Rotate:
 
 				behaviorPlayer.BehaviorLoops [whichLoop].Behaviors.Add (ScriptableObject.CreateInstance ("Rotate") as Behavior);
-				var rotateBehavior = (Rotate)behaviorPlayer.BehaviorLoops [whichLoop].Behaviors [behaviorsCount];
+				var rotateBehavior = (RotateReporter)behaviorPlayer.BehaviorLoops [whichLoop].Behaviors [behaviorsCount];
 
 				rotateBehavior._rotation = behaviorsValues._rotation;
 				rotateBehavior._duration = behaviorsValues._duration;

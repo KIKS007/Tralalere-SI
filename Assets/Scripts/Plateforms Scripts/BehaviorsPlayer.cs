@@ -20,8 +20,10 @@ public class BehaviorsPlayer : MonoBehaviour
 	public bool debugMode = false;
 
 	private Vector3 initialPosition;
+	private Quaternion initialLocalRotation;
 	private Quaternion initialRotation;
 	private Vector3 initialScale;
+	private Color initialColor;
 
 	private Rigidbody _rigidbody;
 
@@ -33,11 +35,13 @@ public class BehaviorsPlayer : MonoBehaviour
 		if (!allStartPlatforms.Contains (GetComponent<OnStart> ()))
 			allStartPlatforms.Add (GetComponent<OnStart> ());
 		
-		initialPosition = transform.parent.position;
-		initialRotation = transform.localRotation;
-		initialScale = transform.localScale;
-
 		_rigidbody = GetComponent<Rigidbody> ();
+
+		initialPosition = transform.parent.position;
+		initialLocalRotation = transform.localRotation;
+		initialRotation = transform.parent.localRotation;
+		initialScale = transform.localScale;
+		initialColor = transform.GetChild (0).GetComponent<Renderer> ().material.color;
 	}
 
 	protected virtual void FixedUpdate ()
@@ -53,16 +57,22 @@ public class BehaviorsPlayer : MonoBehaviour
 		if(initialPosition == Vector3.zero)
 		{
 			initialPosition = transform.parent.position;
-			initialRotation = transform.localRotation;
+			initialLocalRotation = transform.localRotation;
+			initialRotation = transform.parent.localRotation;
+
 			initialScale = transform.localScale;
+			initialColor = transform.GetChild (0).GetComponent<Renderer> ().material.color;
 		}
 
 		transform.parent.position = initialPosition;
-		transform.localRotation = initialRotation;
+		transform.parent.rotation = initialRotation;
+		transform.localRotation = initialLocalRotation;
 		transform.localScale = initialScale;
+		transform.GetChild (0).GetComponent<Renderer> ().material.color = initialColor;
 
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.Euler (Vector3.zero);
+
 
 		//Debug.Log (initialPosition);
 
