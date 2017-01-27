@@ -60,6 +60,12 @@ public class HackingCanvas : MonoBehaviour
 	private float canvasInitialX;
 	private float canvasInitialY;
 
+	public event EventHandler OnHackBegin;
+	public event EventHandler OnHackEnd;
+
+	public event EventHandler OnCloseEditMode;
+
+
 	void Awake ()
 	{
 		_getBehaviors = GetComponent<GetBehaviors> ();
@@ -85,6 +91,8 @@ public class HackingCanvas : MonoBehaviour
 		UICamera.gameObject.SetActive (true);
 
 		HideCanvas ();
+
+		StartCoroutine (OnHackChange (DragAndDrop.oneItemIsDragged));
 	}
 
 	void OnEnable ()
@@ -359,6 +367,9 @@ public class HackingCanvas : MonoBehaviour
 		//Hide
 		if(canvasVisible)
 		{
+			if (OnCloseEditMode != null)
+				OnCloseEditMode ();
+
 			armAnim.SetBool ("EditMode", false);
 
 			DOTween.To (() => canvasRect.height, x => canvasRect.height = x, 0.01f, canvasTweenDuration).SetEase (canvasTweenEase).OnUpdate (() => UICamera.rect = canvasRect).OnComplete (() => canvasVisible = false).SetId ("CanvasVisibility");	
@@ -470,5 +481,26 @@ public class HackingCanvas : MonoBehaviour
 	{
 		foreach (OnStart baheviorPlayer in BehaviorsPlayer.allStartPlatforms)
 			baheviorPlayer.ResetBehaviors ();
+	}
+
+	IEnumerator OnHackChange (bool oneItemIsDragged)
+	{
+		if (oneItemIsDragged)
+		{
+			yield return new WaitUntil (() => !DragAndDrop.oneItemIsDragged);
+
+			if (OnHackEnd != null)
+				OnHackEnd ();
+		}
+
+		else
+		{
+			yield return new WaitUntil (() => DragAndDrop.oneItemIsDragged);
+
+			if (OnHackBegin != null)
+				OnHackBegin ();
+		}
+
+		StartCoroutine (OnHackChange (DragAndDrop.oneItemIsDragged));
 	}
 }

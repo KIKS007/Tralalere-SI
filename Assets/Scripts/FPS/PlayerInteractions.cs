@@ -22,6 +22,8 @@ public class PlayerInteractions : MonoBehaviour {
 	Player _player;
 	Transform _objectSnap;
 
+	//public bool
+
 	// Use this for initialization
 	void Start () {
 		_camera = transform.GetChild (0).GetChild (0).transform;
@@ -82,19 +84,28 @@ public class PlayerInteractions : MonoBehaviour {
 					}
 				}
 			}
-				
+
+			RaycastHit hit2;
+
+			/*if (Physics.Raycast (_camera.position, _camera.forward, out hit2, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore)) 
+			{
+				//Debug.Log (hit.collider.gameObject.name);
+
+				if (hit2.collider.attachedRigidbody == null)
+					return;
+			}*/
+
 			if (_player.GetButtonDown ("Fire")) {
 				if (!CrackMode && !_hackingCanvas.canvasVisible) 
 				{
 					if (gameObject.GetComponent <CCC>()._isGrounded) {
-						RaycastHit hit;
-						if (Physics.Raycast (_camera.position, _camera.forward, out hit, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore)) {
+						if (Physics.Raycast (_camera.position, _camera.forward, out hit2, Mathf.Infinity, layer, QueryTriggerInteraction.Ignore)) {
 							//Debug.Log (hit.collider.gameObject.name);
 
-							if (hit.collider.attachedRigidbody == null)
+							if (hit2.collider.attachedRigidbody == null)
 								return;
 							
-							_hackingCanvas.ToggleCanvasVisibility (hit.collider.attachedRigidbody.gameObject);
+							_hackingCanvas.ToggleCanvasVisibility (hit2.collider.attachedRigidbody.gameObject);
 							CrackMode = true;
 							gameObject.GetComponent <CCC>().Pause = true;
 							Cursor.lockState = CursorLockMode.None;
