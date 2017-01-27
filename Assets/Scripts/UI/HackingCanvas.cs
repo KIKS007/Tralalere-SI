@@ -367,7 +367,7 @@ public class HackingCanvas : MonoBehaviour
 		//Hide
 		if(canvasVisible)
 		{
-			if (OnCloseEditMode != null)
+			if (OnCloseEditMode != null && armAnim.GetBool ("hasModified"))
 				OnCloseEditMode ();
 
 			armAnim.SetBool ("EditMode", false);

@@ -9,7 +9,8 @@ public class ButtonColor : MonoBehaviour, IPointerDownHandler, IPointerEnterHand
 	public string property;
 
 	[Header ("Colors")]
-	public Color enterColor;
+	public Color idleColor;
+    public Color enterColor;
 	public Color downColor;
 
 	private Color exitColor;
@@ -25,11 +26,14 @@ public class ButtonColor : MonoBehaviour, IPointerDownHandler, IPointerEnterHand
 
 		GetComponent<Image> ().material = new Material (GetComponent<Image> ().material);
 
-		exitColor = GetComponent<Image> ().material.GetColor ("_" + property);
-		upColor = GetComponent<Image> ().material.GetColor ("_" + property);
+		exitColor = idleColor;
+		upColor = idleColor;
 
 		material =  GetComponent<Image> ().material;
-	}
+
+        material.SetColor("_" + property, idleColor);
+		text.color = new Color(idleColor.r, idleColor.g, idleColor.b, 1); ;
+    }
 
 	public void OnPointerDown (PointerEventData eventData)
 	{

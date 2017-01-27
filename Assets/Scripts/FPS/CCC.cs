@@ -25,6 +25,7 @@ public class CCC : MonoBehaviour
 	Player player;
 	Transform _cam, _groundCheck;
 	Rigidbody _body;
+	SoundManager _sound;
 
 	float _yRotation = 0f;
 	float _xRotation = 0f;
@@ -46,6 +47,7 @@ public class CCC : MonoBehaviour
 		_cam = transform.GetChild(0);
 		_groundCheck = transform.GetChild(1);
 		_body = GetComponent<Rigidbody>();
+		_sound = GetComponent <SoundManager> ();
 
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.lockState = CursorLockMode.Locked;
@@ -55,8 +57,16 @@ public class CCC : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (!_isGrounded) {
+			_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+			if (_isGrounded) {
+				_sound.PlayLandingSound ();
+			}
+		}
+		else {
+			_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
+		}
 
-		_isGrounded = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
 		if ((_jumpCounter <= 0) && (_body.velocity.y <= 0)) {
 			_canJump = Physics.CheckSphere(_groundCheck.position, GroundCheckRadius, Ground);
 		}
@@ -104,6 +114,21 @@ public class CCC : MonoBehaviour
 			speedTemp = _boostEnabled ? (BoostRunSpeed + speedTemp) : speedTemp;
 			_speed *= speedTemp;
 
+			if ((new Vector2(player.GetAxisRaw ("Move Horizontal"), player.GetAxisRaw ("Move Vertical")) != Vector2.zero) && _isGrounded) {
+				if (_isSprinting) {
+					_sound.StopWalkSound ();
+					_sound.PlayRunSound ();
+				}
+				else {
+					_sound.StopRunSound ();
+					_sound.PlayWalkSound ();
+				}
+			}
+			else {
+				_sound.StopWalkSound ();
+				_sound.StopRunSound ();
+			}
+
 			//JUMP--------------------------------------------------
 			if (player.GetButton ("Jump") && _canJump)
 			{
@@ -113,6 +138,10 @@ public class CCC : MonoBehaviour
 					_body.AddForce(Vector3.up * JumpForce, ForceMode.VelocityChange);
 					_canJump = false;
 					_jumpCounter = 1;
+
+					if (UnityEngine.Random.value >= 0.5f) {
+						_sound.PlayJumpSound ();
+					}
 				}
 
 			}
